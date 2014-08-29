@@ -1,6 +1,5 @@
 package com.comfyfutons.Blocked.Screens;
 
-import Controllers.TextButton2;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.comfyfutons.Blocked.Blocked;
+import com.comfyfutons.Blocked.Controllers.TextButton2;
 
 public class MainMenu implements Screen{
 	//Base Variables
@@ -25,7 +25,7 @@ public class MainMenu implements Screen{
 	TextButtonStyle buttonStyle;
 	TextButton2 playGameButton, levelEditor, options;
 	//Reference Resolution Identifier Variables
-	int screenHeight, screenWidth;
+	float screenHeight, screenWidth;
 	
 	//Constructor
 	public MainMenu(Blocked game){
@@ -48,10 +48,16 @@ public class MainMenu implements Screen{
 		screenHeight = Gdx.graphics.getHeight();
 		screenWidth = Gdx.graphics.getWidth();
 		
-		playGameButton = new TextButton2("Play Game", buttonStyle, screenWidth/2, screenHeight/2, screenWidth/5, screenHeight/5);
-		levelEditor = new TextButton2("Level Editor", buttonStyle, screenWidth/3, screenHeight/3, screenWidth/5, screenHeight/5);
-		options = new TextButton2("Options", buttonStyle, screenWidth/4, screenHeight/4, screenWidth/5, screenHeight/5);
+		float buttonWidth = screenWidth/4;
+		float buttonHeight = screenHeight/4;
+		
+		
+		playGameButton = new TextButton2("Play Game", buttonStyle, screenWidth*0.2f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
+		levelEditor = new TextButton2("Level Editor", buttonStyle, screenWidth*0.5f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
+		options = new TextButton2("Options", buttonStyle, screenWidth*0.8f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
 		stage.addActor(playGameButton);
+		stage.addActor(levelEditor);
+		stage.addActor(options);
 	}
 
 	//Show Method: called when this stage is switched to
