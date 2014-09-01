@@ -12,7 +12,7 @@ Project Name: Blocked
   Installation
   ------------
   The game is not yet prepared for play or usage.
-  In the future the game will be made availiable on the google play market for Android.
+  In the future the game will be made available on the google play market for Android.
 
 
   Licensing
@@ -22,6 +22,6 @@ Project Name: Blocked
 
   Contacts
   --------
-  If you would like to contact with any questions pleast contact through:
+  If you would like to contact with any questions please contact through:
     -cspaskert@gmail.com 
     -message comfyfutons through github
