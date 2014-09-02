@@ -1,4 +1,4 @@
-package com.comfyfutons.Blocked.Screens;
+package com.CIS4914.Blocked.Screens;
 
 
 import com.badlogic.gdx.Gdx;
@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.comfyfutons.Blocked.Blocked;
-import com.comfyfutons.Blocked.Controllers.TextButton2;
+import com.CIS4914.Blocked.Blocked;
+import com.CIS4914.Blocked.Controllers.TextButton2;
 
 public class MainMenu implements Screen{
 	//Base Variables

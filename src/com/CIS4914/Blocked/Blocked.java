@@ -1,8 +1,8 @@
-package com.comfyfutons.Blocked;
+package com.CIS4914.Blocked;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
-import com.comfyfutons.Blocked.Screens.MainMenu;
+import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
