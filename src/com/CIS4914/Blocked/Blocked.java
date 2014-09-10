@@ -1,6 +1,5 @@
 package com.CIS4914.Blocked;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.CIS4914.Blocked.Screens.MainMenu;
 

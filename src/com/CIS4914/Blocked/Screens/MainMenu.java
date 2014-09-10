@@ -3,6 +3,7 @@ package com.CIS4914.Blocked.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -35,6 +36,9 @@ public class MainMenu implements Screen{
 	//Render Method: called continuously
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 		stage.act(Gdx.graphics.getDeltaTime());
 	
 		batch.begin();
@@ -45,6 +49,18 @@ public class MainMenu implements Screen{
 	//Resize Method: called once when the stage is switched to and again every time it is resized
 	@Override
 	public void resize(int width, int height) {
+		stage = new Stage();
+		stage.clear();
+		
+		Gdx.input.setInputProcessor(stage);
+		
+		defaultFont.setScale(width*0.002f);
+		
+        buttonStyle = new TextButtonStyle();
+		buttonStyle.up = skin.getDrawable("buttonUp");
+		buttonStyle.down = skin.getDrawable("buttonDown");
+		buttonStyle.font = defaultFont;
+		
 		screenHeight = Gdx.graphics.getHeight();
 		screenWidth = Gdx.graphics.getWidth();
 		
@@ -64,17 +80,11 @@ public class MainMenu implements Screen{
 	@Override
 	public void show() {
 		batch = new SpriteBatch();
-		stage = new Stage();
-		Gdx.input.setInputProcessor(stage);
-		skin = new Skin();
 		textures = new TextureAtlas("textures.atlas");
+		skin = new Skin();
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont();
-		
-        buttonStyle = new TextButtonStyle();
-		buttonStyle.up = skin.getDrawable("buttonUp");
-		buttonStyle.down = skin.getDrawable("buttonDown");
-		buttonStyle.font = defaultFont;
+
 	}
 
 	//Hide Method: ...
