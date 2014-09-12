@@ -3,6 +3,7 @@ package com.CIS4914.Blocked.Entities;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture;
 
+//Entity class for objects in game
 public class Entity 
 {
 	// Parameters
