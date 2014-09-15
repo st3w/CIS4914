@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 
 public class EditorMenu implements Screen{
@@ -68,8 +69,13 @@ public class EditorMenu implements Screen{
 		screenWidth = width;
 		
 		//TEMPORARY
+		final Vector<String> newLevels = new Vector();
 		final Vector<String> mainLevels = new Vector();
 		final Vector<String> customLevels = new Vector();
+		
+		newLevels.add("Small (100 wide)");
+		newLevels.add("Medium (200 wide)");
+		newLevels.add("Large (300 wide)");
 		
 		mainLevels.add("Level 1");
 		mainLevels.add("Level 2");
@@ -78,10 +84,21 @@ public class EditorMenu implements Screen{
 		mainLevels.add("Level 5");
 		mainLevels.add("Level 6");
 		
-		customLevels.add("Custom Level 1");
-		customLevels.add("Custom Level 2");
-		customLevels.add("Custom Level 3");
-		customLevels.add("Custom Level 4");	
+		customLevels.add("Pit's fallow");
+		customLevels.add("Fire city");
+		customLevels.add("The devli's anus");
+		customLevels.add("Custom level 1");	
+		customLevels.add("Blue terror");
+		customLevels.add("Satin's dungeon");
+		customLevels.add("the keymaster's lair");
+		customLevels.add("Happy rainbow fairy land");	
+		customLevels.add("Garden of eatin'");
+		customLevels.add("super fun time level");
+		customLevels.add("Calipsow's end");
+		customLevels.add("the furrow");	
+		customLevels.add("Temple of undending wruin");	
+		customLevels.add("Newman's den");	
+		customLevels.add("white shoes are cool");	
 		//TEMPORARY
 		
 		stage = new Stage();
@@ -133,7 +150,13 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				//TO-DO FILL
+				levelList.clear();
+				for(int i = 0; i < newLevels.size(); i++){
+					TextButton temp2 = new TextButton(newLevels.get(i), buttonStyle);
+					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
+					levelList.row();
+				}
+				levelList.top();
 			}
 		});
 		
@@ -145,11 +168,12 @@ public class EditorMenu implements Screen{
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				levelList.clear();
 				for(int i = 0; i < mainLevels.size(); i++){
-					LabelStyle testStyle = new LabelStyle(defaultFont, Color.ORANGE);
-					Label temp = new Label(mainLevels.get(i), testStyle);
-					levelList.add(temp);
+					TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyle);
+					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
+				levelList.top();
+				
 			}
 		});
 		
@@ -161,11 +185,11 @@ public class EditorMenu implements Screen{
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				levelList.clear();
 				for(int i = 0; i < customLevels.size(); i++){
-					LabelStyle testStyle = new LabelStyle(defaultFont, Color.ORANGE);
-					Label temp = new Label(customLevels.get(i), testStyle);
-					levelList.add(temp);
+					TextButton temp2 = new TextButton(customLevels.get(i), buttonStyle);
+					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
+				levelList.top();
 			}
 		});
 		
@@ -191,16 +215,16 @@ public class EditorMenu implements Screen{
 
 	    Table table = new Table();
 	    table.setFillParent(true);
-	    table.add(scroller);
+	    table.add(scroller).height(height * 0.75f);;
 	    
 	    table.setWidth(width * 0.38f);
 	    table.setHeight(height * 0.75f);
 	    table.setX(width - table.getWidth());
 	    table.setY(-height * 0.01f);
-
+	    
 	    table.left();
 	    table.top();
-	    
+
 	    stage.addActor(table);
 	}
 
