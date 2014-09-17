@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.utils.Array;
 
 public class EditorMenu implements Screen{
 	//Base Variables
@@ -40,7 +42,7 @@ public class EditorMenu implements Screen{
 	
 	//Button Variables
 	TextButtonStyle buttonStyle;
-	TextButton2 newMap, mainGameMap, customMap, load;
+	TextButton2 newMap, mainGameMap, customMap, load, mainMenu;
 	Table levelList;
 	
 	//Reference Resolution Identifier Variables
@@ -86,7 +88,7 @@ public class EditorMenu implements Screen{
 		
 		customLevels.add("Pit's fallow");
 		customLevels.add("Fire city");
-		customLevels.add("The devli's anus");
+		customLevels.add("Custom Level 3");
 		customLevels.add("Custom level 1");	
 		customLevels.add("Blue terror");
 		customLevels.add("Satin's dungeon");
@@ -97,7 +99,7 @@ public class EditorMenu implements Screen{
 		customLevels.add("Calipsow's end");
 		customLevels.add("the furrow");	
 		customLevels.add("Temple of undending wruin");	
-		customLevels.add("Newman's den");	
+		customLevels.add("Dark's den");	
 		customLevels.add("white shoes are cool");	
 		//TEMPORARY
 		
@@ -128,6 +130,7 @@ public class EditorMenu implements Screen{
         buttonStyle = new TextButtonStyle();
 		buttonStyle.up = skin.getDrawable("buttonUp");
 		buttonStyle.down = skin.getDrawable("buttonDown");
+		buttonStyle.checked = skin.getDrawable("buttonDown");
 		buttonStyle.font = defaultFont;
 		
 		float buttonWidth = width * 0.3f;
@@ -137,11 +140,13 @@ public class EditorMenu implements Screen{
 		mainGameMap = new TextButton2("Main Game Map", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.7f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
 		customMap = new TextButton2("Custom Map", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.5f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
 		load = new TextButton2("Load", buttonStyle, width * 0.8f - buttonWidth * 0.5f, height * 0.1f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
+		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.1f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
 		
 		stage.addActor(newMap);
 		stage.addActor(mainGameMap);
 		stage.addActor(customMap);
 		stage.addActor(load);
+		stage.addActor(mainMenu);
 		
 		//Button Listeners//
 		//New Map Button Listeners
@@ -150,9 +155,22 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				mainGameMap.setChecked(false);
+				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < newLevels.size(); i++){
-					TextButton temp2 = new TextButton(newLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(newLevels.get(i), buttonStyle);
+					
+					//button from list
+					temp2.addListener(new InputListener(){
+						public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+							return true;
+						}
+						public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+							updateList(temp2.getText().toString());
+						}
+					});
+					
 					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
@@ -166,9 +184,22 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				newMap.setChecked(false);
+				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < mainLevels.size(); i++){
-					TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyle);
+					
+					//button from list
+					temp2.addListener(new InputListener(){
+						public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+							return true;
+						}
+						public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+							updateList(temp2.getText().toString());
+						}
+					});
+					
 					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
@@ -183,9 +214,22 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				newMap.setChecked(false);
+				mainGameMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < customLevels.size(); i++){
-					TextButton temp2 = new TextButton(customLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(customLevels.get(i), buttonStyle);
+					
+					//button from list
+					temp2.addListener(new InputListener(){
+						public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+							return true;
+						}
+						public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+							updateList(temp2.getText().toString());
+						}
+					});
+					
 					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
@@ -205,6 +249,17 @@ public class EditorMenu implements Screen{
 					public void run() {
 					}
 				})));
+			}
+		});
+		
+		//Main Menu Button Listener
+		mainMenu.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				((Blocked) Gdx.app.getApplicationListener()).setScreen(new MainMenu(game)); 
+
 			}
 		});
 		
@@ -266,5 +321,18 @@ public class EditorMenu implements Screen{
 		stage.dispose();
 		
 	}
+	
+	/*	updateList Method: Takes the table and updates it by getting the cells, 
+	*						putting them in an array, making sure the only checked 
+	*						button is the selected one, then re-populates the levelList table */
+	void updateList(String selectedName){
+		Array<Cell> list = levelList.getCells();
+		for(int i = 0; i < list.size; i++){
+			if(((TextButton) list.get(i).getActor()).isChecked() == true && !((TextButton) list.get(i).getActor()).getText().toString().equals(selectedName)){
+				((TextButton) list.get(i).getActor()).setChecked(false);
+			}
+		}
+	}
+	
 	
 }
