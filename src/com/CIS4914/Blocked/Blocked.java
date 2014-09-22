@@ -8,16 +8,17 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "0.00.00 Alpha Initial Commit";
+	public static final String version = "0.00.01 some Menu's and Asset's manager";
 	public static final String LOG = "Blocked";
+	public static AssetManager manager;
 	
-	private AssetManager manager;
     private MainMenu mainMenuScreen;
 
    @Override
     public void create() {
 	   	manager = new AssetManager();
-		manager.load("smiley.png", Texture.class);
+		manager.load("menu_background.png", Texture.class);
+		manager.load("table_background.png", Texture.class);
 		manager.finishLoading();
 		
         mainMenuScreen = new MainMenu(this);

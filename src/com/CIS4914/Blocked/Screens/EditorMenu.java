@@ -111,13 +111,13 @@ public class EditorMenu implements Screen{
 		defaultFont.setScale(width * 0.002f);
 		
 		//Background Textures
-		background = new Texture("menu_background.png");
+		background = Blocked.manager.get("menu_background.png");
 		backgroundImage = new Image(background);
 		backgroundImage.setWidth(width);
 		backgroundImage.setHeight(height);
 		stage.addActor(backgroundImage);
 		
-		tableBackground = new Texture("table_background.png");
+		tableBackground = Blocked.manager.get("table_background.png");
 		tableBackgroundImage = new Image(tableBackground);
 		tableBackgroundImage.setWidth(width * 0.4f);
 		tableBackgroundImage.setHeight(height * 0.8f);
