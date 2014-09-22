@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import com.CIS4914.Blocked.Blocked;
 import com.CIS4914.Blocked.Controllers.TextButton2;
+import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -75,9 +76,9 @@ public class EditorMenu implements Screen{
 		final Vector<String> mainLevels = new Vector();
 		final Vector<String> customLevels = new Vector();
 		
-		newLevels.add("Small (100 wide)");
-		newLevels.add("Medium (200 wide)");
-		newLevels.add("Large (300 wide)");
+		newLevels.add("Small");
+		newLevels.add("Medium");
+		newLevels.add("Large");
 		
 		mainLevels.add("Level 1");
 		mainLevels.add("Level 2");
@@ -243,12 +244,41 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-
-				stage.addAction(Actions.sequence(Actions.fadeOut(.3f), Actions.run(new Runnable() {
-					@Override
-					public void run() {
+				Boolean mapSelected = false;
+				Level selectedLevel = null;
+				
+				if(newMap.isChecked()){
+					for(int i = 0; i < newLevels.size(); i++){
+						Array<Cell> list = levelList.getCells();
+						TextButton currentButton = ((TextButton) list.get(i).getActor());
+						String buttonText = currentButton.getText().toString();
+						if(currentButton.isChecked()){
+							mapSelected = true;
+							System.out.println("Horray");
+							
+							if(buttonText.equals("Small")){
+								selectedLevel = new Level("New Small Level", 100);
+							} else if(buttonText.equals("Medium")){
+								selectedLevel = new Level("New Medium Level", 200);
+							} else if(buttonText.equals("Large")){
+								selectedLevel = new Level("New Large Level", 300);
+							} else{
+								System.out.println("no map selected");
+							}
+						}	
 					}
-				})));
+				} else if(mainGameMap.isChecked()){
+					
+				} else if(customMap.isChecked()){
+					
+				} else{
+					System.out.println("no category selected");
+				}
+				
+				
+				if(mapSelected){
+					((Blocked) Gdx.app.getApplicationListener()).setScreen(new LevelEditor(selectedLevel, game)); 
+				}
 			}
 		});
 		
@@ -328,7 +358,7 @@ public class EditorMenu implements Screen{
 	void updateList(String selectedName){
 		Array<Cell> list = levelList.getCells();
 		for(int i = 0; i < list.size; i++){
-			if(((TextButton) list.get(i).getActor()).isChecked() == true && !((TextButton) list.get(i).getActor()).getText().toString().equals(selectedName)){
+			if(((TextButton) list.get(i).getActor()).isChecked() && !((TextButton) list.get(i).getActor()).getText().toString().equals(selectedName)){
 				((TextButton) list.get(i).getActor()).setChecked(false);
 			}
 		}

@@ -2,6 +2,7 @@ package com.CIS4914.Blocked.Screens;
 
 import com.CIS4914.Blocked.Blocked;
 import com.CIS4914.Blocked.Controllers.TextButton2;
+import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,6 +17,7 @@ public class LevelEditor implements Screen
 {
 	//Base Variables
 	Blocked game;
+	Level currentLevel;
 	SpriteBatch batch;
 	Stage stage;
 	//Texture Variables
@@ -24,12 +26,13 @@ public class LevelEditor implements Screen
 	TextureAtlas textures;
 	//Button Variables
 	TextButtonStyle buttonStyle;
-	TextButton2 playGameButton, levelEditor, options;
+	TextButton2 testButton;
 	//Reference Resolution Identifier Variables
 	float screenHeight, screenWidth;
 	
-	public LevelEditor(Blocked game)
+	public LevelEditor(Level selectedLevel, Blocked game)
 	{
+		currentLevel = selectedLevel;
 		this.game = game;
 	}
 
@@ -67,13 +70,10 @@ public class LevelEditor implements Screen
 		float buttonWidth = screenWidth/4;
 		float buttonHeight = screenHeight/4;
 		
+		String test = currentLevel.getName();
 		
-		playGameButton = new TextButton2("Play Game", buttonStyle, screenWidth*0.2f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		levelEditor = new TextButton2("Level Editor", buttonStyle, screenWidth*0.5f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		options = new TextButton2("Options", buttonStyle, screenWidth*0.8f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		stage.addActor(playGameButton);
-		stage.addActor(levelEditor);
-		stage.addActor(options);	
+		testButton = new TextButton2(test, buttonStyle, screenWidth*0.5f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
+		stage.addActor(testButton);
 	}
 
 	@Override
