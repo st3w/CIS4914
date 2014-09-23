@@ -4,14 +4,19 @@ package com.CIS4914.Blocked.Screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.CIS4914.Blocked.Blocked;
 import com.CIS4914.Blocked.Controllers.TextButton2;
@@ -23,8 +28,11 @@ public class MainMenu implements Screen{
 	Stage stage;
 	//Texture Variables
 	Skin skin;
-	BitmapFont defaultFont;
+	BitmapFont defaultFont, buttonFont;
 	TextureAtlas textures;
+	Image backgroundImage;
+	LabelStyle versionText;
+	Label gameVersion;
 	//Button Variables
 	TextButtonStyle buttonStyle;
 	TextButton2 playGameButton, levelEditor, options;
@@ -57,23 +65,32 @@ public class MainMenu implements Screen{
 		
 		Gdx.input.setInputProcessor(stage);
 		
-		defaultFont.setScale(width*0.002f);
+		buttonFont.setScale(width * 0.00035f);
+
+		backgroundImage = new Image(Blocked.manager.get("main_menu_background.png", Texture.class));
+		backgroundImage.setWidth(width);
+		backgroundImage.setHeight(height);
+		stage.addActor(backgroundImage);
+		
+		versionText = new LabelStyle(defaultFont, Color.WHITE);
+		gameVersion = new Label("Version: " + Blocked.version, versionText);
+		stage.addActor(gameVersion);
 		
         buttonStyle = new TextButtonStyle();
-		buttonStyle.up = skin.getDrawable("buttonUp");
-		buttonStyle.down = skin.getDrawable("buttonDown");
-		buttonStyle.font = defaultFont;
+		buttonStyle.up = skin.getDrawable("button_up");
+		buttonStyle.down = skin.getDrawable("button_down");
+		buttonStyle.font = buttonFont;
 		
 		screenHeight = Gdx.graphics.getHeight();
 		screenWidth = Gdx.graphics.getWidth();
 		
-		float buttonWidth = screenWidth/4;
-		float buttonHeight = screenHeight/4;
+		float buttonWidth = width * 0.23f;
+		float buttonHeight = height * 0.16f;
 		
 		
-		playGameButton = new TextButton2("Play Game", buttonStyle, screenWidth*0.2f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		levelEditor = new TextButton2("Level Editor", buttonStyle, screenWidth*0.5f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		options = new TextButton2("Options", buttonStyle, screenWidth*0.8f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
+		playGameButton = new TextButton2("Play Game", buttonStyle, width * 0.2f - buttonWidth * 0.5f, height * 0.45f, buttonWidth, buttonHeight);
+		levelEditor = new TextButton2("Level Editor", buttonStyle, width * 0.5f - buttonWidth * 0.5f, height * 0.45f, buttonWidth, buttonHeight);
+		options = new TextButton2("Options", buttonStyle, width * 0.8f - buttonWidth * 0.5f, height * 0.45f, buttonWidth, buttonHeight);
 		stage.addActor(playGameButton);
 		stage.addActor(levelEditor);
 		stage.addActor(options);
@@ -115,6 +132,7 @@ public class MainMenu implements Screen{
 		skin = new Skin();
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont();
+		buttonFont = new BitmapFont(Gdx.files.internal("Arial_Black_72pt.fnt"), false);
 
 	}
 
@@ -139,12 +157,13 @@ public class MainMenu implements Screen{
 	//Dispose Method: called when exiting this stage completely
 	@Override
 	public void dispose() {
-		batch.dispose();
 		game.dispose();
+		batch.dispose();
+		stage.dispose();
 		skin.dispose();
 		defaultFont.dispose();
+		buttonFont.dispose();
 		textures.dispose();
-		stage.dispose();
-	
 	}
+
 }

@@ -109,7 +109,7 @@ public class EditorMenu implements Screen{
 		
 		Gdx.input.setInputProcessor(stage);
 		
-		defaultFont.setScale(width * 0.002f);
+		defaultFont.setScale(width * 0.00035f);
 		
 		//Background Textures
 		background = Blocked.manager.get("menu_background.png");
@@ -120,34 +120,53 @@ public class EditorMenu implements Screen{
 		
 		tableBackground = Blocked.manager.get("table_background.png");
 		tableBackgroundImage = new Image(tableBackground);
-		tableBackgroundImage.setWidth(width * 0.4f);
-		tableBackgroundImage.setHeight(height * 0.8f);
-		tableBackgroundImage.setX(width - tableBackgroundImage.getWidth());
-		tableBackgroundImage.setY(height - tableBackgroundImage.getHeight());
+		tableBackgroundImage.setWidth(width * 0.52f);
+		tableBackgroundImage.setHeight(height * 0.75f);
+		tableBackgroundImage.setX(width * 0.989f - tableBackgroundImage.getWidth());
+		tableBackgroundImage.setY(height * 0.98f - tableBackgroundImage.getHeight());
 		stage.addActor(tableBackgroundImage);
 		
 		
 		//Button instantiation and adding to stage
         buttonStyle = new TextButtonStyle();
-		buttonStyle.up = skin.getDrawable("buttonUp");
-		buttonStyle.down = skin.getDrawable("buttonDown");
-		buttonStyle.checked = skin.getDrawable("buttonDown");
+		buttonStyle.up = skin.getDrawable("button_up");
+		buttonStyle.down = skin.getDrawable("button_down");
+		buttonStyle.checked = skin.getDrawable("button_down");
 		buttonStyle.font = defaultFont;
 		
 		float buttonWidth = width * 0.3f;
 		float buttonHeight = width * 0.1f;
 		
-		newMap = new TextButton2("New Map", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.9f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
-		mainGameMap = new TextButton2("Main Game Map", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.7f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
-		customMap = new TextButton2("Custom Map", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.5f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
-		load = new TextButton2("Load", buttonStyle, width * 0.8f - buttonWidth * 0.5f, height * 0.1f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
-		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.15f - buttonWidth * 0.5f, height * 0.1f - buttonHeight * 0.5f, buttonWidth, buttonHeight);
+		newMap = new TextButton2("New Map", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		mainGameMap = new TextButton2("Main Game Map", 	buttonStyle, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
+		customMap = new TextButton2("Custom Map", buttonStyle, width * 0.015f, height - buttonHeight * 3 - width * 0.06f, buttonWidth, buttonHeight);
+		load = new TextButton2("Load", buttonStyle, width * 0.729f - buttonWidth * 0.5f, width * 0.015f, buttonWidth, buttonHeight);
+		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
 		
 		stage.addActor(newMap);
 		stage.addActor(mainGameMap);
 		stage.addActor(customMap);
 		stage.addActor(load);
 		stage.addActor(mainMenu);
+		
+		//Scrollable List
+		levelList = new Table(skin);	
+
+	    ScrollPane scroller = new ScrollPane(levelList);
+
+	    Table table = new Table();
+	    table.setFillParent(true);
+	    table.add(scroller).height(height * 0.724f);;
+	    
+	    table.setWidth(width * 0.501f);
+	    table.setHeight(height * 0.7f);
+	    table.setX(width * 0.98f - table.getWidth());
+	    table.setY(-height * 0.034f);
+	    
+	    table.left();
+	    table.top();
+
+	    stage.addActor(table);
 		
 		//Button Listeners//
 		//New Map Button Listeners
@@ -172,7 +191,7 @@ public class EditorMenu implements Screen{
 						}
 					});
 					
-					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
+					levelList.add(temp2).left().width(screenWidth * 0.5f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
 				levelList.top();
@@ -201,7 +220,7 @@ public class EditorMenu implements Screen{
 						}
 					});
 					
-					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
+					levelList.add(temp2).left().width(screenWidth * 0.5f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
 				levelList.top();
@@ -231,7 +250,7 @@ public class EditorMenu implements Screen{
 						}
 					});
 					
-					levelList.add(temp2).left().width(screenWidth * 0.36f).height(screenHeight * 0.15f);
+					levelList.add(temp2).left().width(screenWidth * 0.5f).height(screenHeight * 0.15f);
 					levelList.row();
 				}
 				levelList.top();
@@ -293,24 +312,6 @@ public class EditorMenu implements Screen{
 			}
 		});
 		
-		//Scrollable List
-		levelList = new Table(skin);	
-
-	    ScrollPane scroller = new ScrollPane(levelList);
-
-	    Table table = new Table();
-	    table.setFillParent(true);
-	    table.add(scroller).height(height * 0.75f);;
-	    
-	    table.setWidth(width * 0.38f);
-	    table.setHeight(height * 0.75f);
-	    table.setX(width - table.getWidth());
-	    table.setY(-height * 0.01f);
-	    
-	    table.left();
-	    table.top();
-
-	    stage.addActor(table);
 	}
 
 	@Override
@@ -319,7 +320,7 @@ public class EditorMenu implements Screen{
 		textures = new TextureAtlas("textures.atlas");
 		skin = new Skin();
 		skin.addRegions(textures);
-		defaultFont = new BitmapFont();
+		defaultFont = new BitmapFont(Gdx.files.internal("Arial_Black_72pt.fnt"), false);
 		
 	}
 

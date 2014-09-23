@@ -60,8 +60,8 @@ public class LevelEditor implements Screen
 		defaultFont.setScale(width*0.002f);
 		
         buttonStyle = new TextButtonStyle();
-		buttonStyle.up = skin.getDrawable("buttonUp");
-		buttonStyle.down = skin.getDrawable("buttonDown");
+		buttonStyle.up = skin.getDrawable("button_up");
+		buttonStyle.down = skin.getDrawable("button_down");
 		buttonStyle.font = defaultFont;
 		
 		screenHeight = Gdx.graphics.getHeight();

@@ -8,7 +8,7 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "0.00.01 some Menu's and Asset's manager";
+	public static final String version = "V0.00.02 Pre-Alpha (New menu background, button images, graphics positioning optimized)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
 	
@@ -17,6 +17,7 @@ public class Blocked extends Game {
    @Override
     public void create() {
 	   	manager = new AssetManager();
+	   	manager.load("main_menu_background.png", Texture.class);
 		manager.load("menu_background.png", Texture.class);
 		manager.load("table_background.png", Texture.class);
 		manager.finishLoading();
