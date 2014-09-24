@@ -101,7 +101,7 @@ public class MainMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				//TO-DO FILL
+				((Blocked) Gdx.app.getApplicationListener()).setScreen(new GameMenu(game)); 
 			}
 		});
 		
@@ -132,7 +132,7 @@ public class MainMenu implements Screen{
 		skin = new Skin();
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont();
-		buttonFont = new BitmapFont(Gdx.files.internal("Arial_Black_72pt.fnt"), false);
+		buttonFont = new BitmapFont(Gdx.files.internal("arial_black_72pt.fnt"), false);
 
 	}
 

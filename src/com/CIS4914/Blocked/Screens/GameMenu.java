@@ -28,7 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Array;
 
-public class EditorMenu implements Screen{
+public class GameMenu implements Screen{
 	//Base Variables
 	Blocked game;
 	SpriteBatch batch;
@@ -43,14 +43,14 @@ public class EditorMenu implements Screen{
 	
 	//Button Variables
 	TextButtonStyle buttonStyle;
-	TextButton2 newMap, mainGameMap, customMap, load, mainMenu;
+	TextButton2 mainGameMap, customMap, load, mainMenu;
 	Table levelList;
 	
 	//Reference Resolution Identifier Variables
 	float screenHeight, screenWidth;
 	
 	//Constructor
-	public EditorMenu(Blocked game){
+	public GameMenu(Blocked game){
 		this.game = game;
 	}
 	
@@ -72,13 +72,8 @@ public class EditorMenu implements Screen{
 		screenWidth = width;
 		
 		//TEMPORARY
-		final Vector<String> newLevels = new Vector();
 		final Vector<String> mainLevels = new Vector();
 		final Vector<String> customLevels = new Vector();
-		
-		newLevels.add("Small");
-		newLevels.add("Medium");
-		newLevels.add("Large");
 		
 		mainLevels.add("Level 1");
 		mainLevels.add("Level 2");
@@ -137,13 +132,11 @@ public class EditorMenu implements Screen{
 		float buttonWidth = width * 0.3f;
 		float buttonHeight = width * 0.1f;
 		
-		newMap = new TextButton2("New Map", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		mainGameMap = new TextButton2("Main Game Maps", 	buttonStyle, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
-		customMap = new TextButton2("Custom Maps", buttonStyle, width * 0.015f, height - buttonHeight * 3 - width * 0.06f, buttonWidth, buttonHeight);
+		mainGameMap = new TextButton2("Main Game Maps", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		customMap = new TextButton2("Custom Maps", 	buttonStyle, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
 		load = new TextButton2("Load", buttonStyle, width * 0.729f - buttonWidth * 0.5f, width * 0.015f, buttonWidth, buttonHeight);
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
 		
-		stage.addActor(newMap);
 		stage.addActor(mainGameMap);
 		stage.addActor(customMap);
 		stage.addActor(load);
@@ -169,42 +162,12 @@ public class EditorMenu implements Screen{
 	    stage.addActor(table);
 		
 		//Button Listeners//
-		//New Map Button Listeners
-		newMap.addListener(new InputListener(){
-			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				return true;
-			}
-			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				mainGameMap.setChecked(false);
-				customMap.setChecked(false);
-				levelList.clear();
-				for(int i = 0; i < newLevels.size(); i++){
-					final TextButton temp2 = new TextButton(newLevels.get(i), buttonStyle);
-					
-					//button from list
-					temp2.addListener(new InputListener(){
-						public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-							return true;
-						}
-						public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-							updateList(temp2.getText().toString());
-						}
-					});
-					
-					levelList.add(temp2).left().width(screenWidth * 0.5f).height(screenHeight * 0.15f);
-					levelList.row();
-				}
-				levelList.top();
-			}
-		});
-		
 		//Main Game Maps Listener
 		mainGameMap.addListener(new InputListener(){
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				newMap.setChecked(false);
 				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < mainLevels.size(); i++){
@@ -234,7 +197,6 @@ public class EditorMenu implements Screen{
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				newMap.setChecked(false);
 				mainGameMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < customLevels.size(); i++){
@@ -266,27 +228,7 @@ public class EditorMenu implements Screen{
 				Boolean mapSelected = false;
 				Level selectedLevel = null;
 				
-				if(newMap.isChecked()){
-					for(int i = 0; i < newLevels.size(); i++){
-						Array<Cell> list = levelList.getCells();
-						TextButton currentButton = ((TextButton) list.get(i).getActor());
-						String buttonText = currentButton.getText().toString();
-						if(currentButton.isChecked()){
-							mapSelected = true;
-							System.out.println("Horray");
-							
-							if(buttonText.equals("Small")){
-								selectedLevel = new Level("New Small Level", 100);
-							} else if(buttonText.equals("Medium")){
-								selectedLevel = new Level("New Medium Level", 200);
-							} else if(buttonText.equals("Large")){
-								selectedLevel = new Level("New Large Level", 300);
-							} else{
-								System.out.println("no map selected");
-							}
-						}	
-					}
-				} else if(mainGameMap.isChecked()){
+				if(mainGameMap.isChecked()){
 					
 				} else if(customMap.isChecked()){
 					
