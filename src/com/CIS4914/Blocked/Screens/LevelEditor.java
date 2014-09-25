@@ -6,7 +6,10 @@ import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -16,19 +19,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 public class LevelEditor implements Screen 
 {
 	//Base Variables
-	Blocked game;
-	Level currentLevel;
-	SpriteBatch batch;
-	Stage stage;
+	private Blocked game;
+	private Level currentLevel;
+	private SpriteBatch batch;
+	private Stage stage;
 	//Texture Variables
-	Skin skin;
-	BitmapFont defaultFont;
-	TextureAtlas textures;
+	private Skin skin;
+	private BitmapFont defaultFont;
+	private TextureAtlas textures;
 	//Button Variables
-	TextButtonStyle buttonStyle;
-	TextButton2 testButton;
+	private TextButtonStyle buttonStyle;
+	private TextButton2 pause, save;
 	//Reference Resolution Identifier Variables
 	float screenHeight, screenWidth;
+	
+	static final int WORLD_WIDTH = 100;
+    static final int WORLD_HEIGHT = 100;
+
+    OrthographicCamera cam;
+
+    Sprite mapSprite;
+    private float rotationSpeed;
 	
 	public LevelEditor(Level selectedLevel, Blocked game)
 	{
@@ -39,14 +50,21 @@ public class LevelEditor implements Screen
 	@Override
 	public void render(float delta) {
 		
+		cam.update();
+		batch.setProjectionMatrix(cam.combined);
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		stage.act(Gdx.graphics.getDeltaTime());
 	
 		batch.begin();
+        mapSprite.draw(batch);
+		batch.end();
+		
+		batch.begin();
 		stage.draw();
-		batch.end();	
+		batch.end();
 	}
 
 	@Override
@@ -70,20 +88,37 @@ public class LevelEditor implements Screen
 		float buttonWidth = screenWidth/4;
 		float buttonHeight = screenHeight/4;
 		
-		String test = currentLevel.getName();
+		//String test = currentLevel.getName();
 		
-		testButton = new TextButton2(test, buttonStyle, screenWidth*0.5f - buttonWidth/2, screenHeight/2, buttonWidth, buttonHeight);
-		stage.addActor(testButton);
+		pause = new TextButton2("Pause", buttonStyle, screenWidth*0.15f - buttonWidth/2, screenHeight/2 + screenHeight/4 + 60, buttonWidth/2, buttonHeight/2);
+		save = new TextButton2("Save", buttonStyle, screenWidth*0.29f - buttonWidth/2, screenHeight/2 + screenHeight/4 + 60, buttonWidth/2, buttonHeight/2);
+		stage.addActor(pause);
+		stage.addActor(save);
+		
 	}
 
 	@Override
 	public void show() {
 		
-		batch = new SpriteBatch();
+		//batch = new SpriteBatch();
 		textures = new TextureAtlas("textures.atlas");
 		skin = new Skin();
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont();	
+		
+		rotationSpeed = 0.5f;
+
+        mapSprite = new Sprite(new Texture(Gdx.files.internal("main_menu_background.png")));
+        mapSprite.setPosition(0, 0);
+        mapSprite.setSize(WORLD_WIDTH, WORLD_HEIGHT);
+        
+        //float width = Gdx.graphics.getWidth();
+        //float height = Gdx.graphics.getHeight();
+        cam = new OrthographicCamera(100, 100);
+        cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
+        cam.update();
+		
+        batch = new SpriteBatch();
 	}
 
 	@Override
