@@ -8,7 +8,7 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "V0.00.03 Pre-Alpha (Game Menu implemented, Android specific bug fixes)";
+	public static final String version = "V0.00.04 Pre-Alpha (Beginnning implementation of level editor, Other small fixes)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
 	

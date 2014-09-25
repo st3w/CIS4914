@@ -11,21 +11,21 @@ public class Level {
 	private String name;
 	private Entity[][] grid;
 	private Texture background;
+	private float levelWidth;
 	
 	// constructor
 	public Level(String name, int width){
 		this.name = name;
+		levelWidth = width;
 		
 		// TEMP VALUES
 		Block air = null;
 		Block immovableBrick;
 		Block movableBrick;
 		
-		grid = new Entity[20][width];
+		grid = new Entity[12][width];
 		
-		//background = Gdx.files.internal(FILE_PATH)
-		
-		for(int i = 0; i < 20; i++){
+		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < width; j++){
 				grid[i][j] = air;
 			}
@@ -41,6 +41,11 @@ public class Level {
 	// setName Method: Sets the level name
 	public void setName(String name){
 		this.name = name;
+	}
+	
+	// getWidth Method: returns the level width
+	public float getWidth(){
+		return levelWidth;
 	}
 	
 	// getGrid Method: Returns the entity in the X,Y coordinate

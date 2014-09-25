@@ -42,7 +42,7 @@ public class GameMenu implements Screen{
 	Image backgroundImage, tableBackgroundImage;
 	
 	//Button Variables
-	TextButtonStyle buttonStyle;
+	TextButtonStyle buttonStyle, buttonStyleCheckable;
 	TextButton2 mainGameMap, customMap, load, mainMenu;
 	Table levelList;
 	
@@ -126,14 +126,19 @@ public class GameMenu implements Screen{
         buttonStyle = new TextButtonStyle();
 		buttonStyle.up = skin.getDrawable("button_up");
 		buttonStyle.down = skin.getDrawable("button_down");
-		buttonStyle.checked = skin.getDrawable("button_down");
 		buttonStyle.font = defaultFont;
+		
+		buttonStyleCheckable = new TextButtonStyle();
+		buttonStyleCheckable.up = skin.getDrawable("button_up");
+		buttonStyleCheckable.down = skin.getDrawable("button_down");
+		buttonStyleCheckable.checked = skin.getDrawable("button_down");
+		buttonStyleCheckable.font = defaultFont;
 		
 		float buttonWidth = width * 0.3f;
 		float buttonHeight = width * 0.1f;
 		
-		mainGameMap = new TextButton2("Main Game Maps", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		customMap = new TextButton2("Custom Maps", 	buttonStyle, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
+		mainGameMap = new TextButton2("Main Game Maps", buttonStyleCheckable, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		customMap = new TextButton2("Custom Maps", 	buttonStyleCheckable, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
 		load = new TextButton2("Load", buttonStyle, width * 0.729f - buttonWidth * 0.5f, width * 0.015f, buttonWidth, buttonHeight);
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
 		
@@ -171,7 +176,7 @@ public class GameMenu implements Screen{
 				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < mainLevels.size(); i++){
-					final TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyleCheckable);
 					
 					//button from list
 					temp2.addListener(new InputListener(){
@@ -200,7 +205,7 @@ public class GameMenu implements Screen{
 				mainGameMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < customLevels.size(); i++){
-					final TextButton temp2 = new TextButton(customLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(customLevels.get(i), buttonStyleCheckable);
 					
 					//button from list
 					temp2.addListener(new InputListener(){

@@ -7,7 +7,6 @@ import com.CIS4914.Blocked.Controllers.TextButton2;
 import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -16,14 +15,11 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Array;
@@ -42,7 +38,7 @@ public class EditorMenu implements Screen{
 	Image backgroundImage, tableBackgroundImage;
 	
 	//Button Variables
-	TextButtonStyle buttonStyle;
+	TextButtonStyle buttonStyle, buttonStyleCheckable;
 	TextButton2 newMap, mainGameMap, customMap, load, mainMenu;
 	Table levelList;
 	
@@ -131,15 +127,20 @@ public class EditorMenu implements Screen{
         buttonStyle = new TextButtonStyle();
 		buttonStyle.up = skin.getDrawable("button_up");
 		buttonStyle.down = skin.getDrawable("button_down");
-		buttonStyle.checked = skin.getDrawable("button_down");
 		buttonStyle.font = defaultFont;
+		
+		buttonStyleCheckable = new TextButtonStyle();
+		buttonStyleCheckable.up = skin.getDrawable("button_up");
+		buttonStyleCheckable.down = skin.getDrawable("button_down");
+		buttonStyleCheckable.checked = skin.getDrawable("button_down");
+		buttonStyleCheckable.font = defaultFont;
 		
 		float buttonWidth = width * 0.3f;
 		float buttonHeight = width * 0.1f;
 		
-		newMap = new TextButton2("New Map", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		mainGameMap = new TextButton2("Main Game Maps", 	buttonStyle, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
-		customMap = new TextButton2("Custom Maps", buttonStyle, width * 0.015f, height - buttonHeight * 3 - width * 0.06f, buttonWidth, buttonHeight);
+		newMap = new TextButton2("New Map", buttonStyleCheckable, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		mainGameMap = new TextButton2("Main Game Maps", buttonStyleCheckable, width * 0.015f, height - buttonHeight * 2 - width * 0.04f, buttonWidth, buttonHeight);
+		customMap = new TextButton2("Custom Maps", buttonStyleCheckable, width * 0.015f, height - buttonHeight * 3 - width * 0.06f, buttonWidth, buttonHeight);
 		load = new TextButton2("Load", buttonStyle, width * 0.729f - buttonWidth * 0.5f, width * 0.015f, buttonWidth, buttonHeight);
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
 		
@@ -179,7 +180,7 @@ public class EditorMenu implements Screen{
 				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < newLevels.size(); i++){
-					final TextButton temp2 = new TextButton(newLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(newLevels.get(i), buttonStyleCheckable);
 					
 					//button from list
 					temp2.addListener(new InputListener(){
@@ -208,7 +209,7 @@ public class EditorMenu implements Screen{
 				customMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < mainLevels.size(); i++){
-					final TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(mainLevels.get(i), buttonStyleCheckable);
 					
 					//button from list
 					temp2.addListener(new InputListener(){
@@ -238,7 +239,7 @@ public class EditorMenu implements Screen{
 				mainGameMap.setChecked(false);
 				levelList.clear();
 				for(int i = 0; i < customLevels.size(); i++){
-					final TextButton temp2 = new TextButton(customLevels.get(i), buttonStyle);
+					final TextButton temp2 = new TextButton(customLevels.get(i), buttonStyleCheckable);
 					
 					//button from list
 					temp2.addListener(new InputListener(){
@@ -273,8 +274,7 @@ public class EditorMenu implements Screen{
 						String buttonText = currentButton.getText().toString();
 						if(currentButton.isChecked()){
 							mapSelected = true;
-							System.out.println("Horray");
-							
+
 							if(buttonText.equals("Small")){
 								selectedLevel = new Level("New Small Level", 100);
 							} else if(buttonText.equals("Medium")){

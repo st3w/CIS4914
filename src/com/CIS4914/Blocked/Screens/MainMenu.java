@@ -1,8 +1,7 @@
 package com.CIS4914.Blocked.Screens;
 
 
-import com.CIS4914.Blocked.Blocked;
-import com.CIS4914.Blocked.Controllers.TextButton2;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -16,12 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.CIS4914.Blocked.Blocked;
+import com.CIS4914.Blocked.Controllers.TextButton2;
 
 public class MainMenu implements Screen{
-	
 	//Base Variables
 	Blocked game;
 	SpriteBatch batch;
@@ -66,6 +66,7 @@ public class MainMenu implements Screen{
 		Gdx.input.setInputProcessor(stage);
 		
 		buttonFont.setScale(width * 0.00035f);
+		defaultFont.setScale(width * 0.0007f);
 
 		backgroundImage = new Image(Blocked.manager.get("main_menu_background.png", Texture.class));
 		backgroundImage.setWidth(width);
