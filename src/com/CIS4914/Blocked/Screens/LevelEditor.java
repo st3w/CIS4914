@@ -21,6 +21,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -40,7 +42,7 @@ public class LevelEditor implements Screen, GestureListener{
 	
 	//Texture Variables
 	Skin skin;
-	BitmapFont defaultFont;
+	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
 	Texture tableBackground;
 	Image backgroundImage, tableBackgroundImage;
@@ -48,7 +50,7 @@ public class LevelEditor implements Screen, GestureListener{
 	int backgroundTiles;
 	
 	//Button Variables
-	TextButtonStyle buttonStyle, buttonStyleCheckable;
+	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
 	TextButton2 mainMenu, pause, save;
 	Table levelList;
 	
@@ -150,6 +152,12 @@ public class LevelEditor implements Screen, GestureListener{
 		buttonStyleCheckable.checked = skin.getDrawable("button_down");
 		buttonStyleCheckable.font = defaultFont;
 		
+		blockButtonStyle = new TextButtonStyle();
+		blockButtonStyle.up = skin.getDrawable("brick_button_up");
+		blockButtonStyle.down = skin.getDrawable("brick_button_down");
+		blockButtonStyle.checked = skin.getDrawable("brick_button_down");
+		blockButtonStyle.font = invisibleFont;
+		
 		float buttonWidth = width * 0.18f;
 		float buttonHeight = width * 0.06f;
 		
@@ -182,7 +190,13 @@ public class LevelEditor implements Screen, GestureListener{
 		
 	    levelList.clear();
 		for(int i = 0; i < blocks.size(); i++){
-			final TextButton temp2 = new TextButton(blocks.get(i), buttonStyleCheckable);
+			final TextButton temp2;
+			
+			if(i == 0){
+				temp2 = new TextButton(blocks.get(i), blockButtonStyle);
+			} else{
+				temp2 = new TextButton(blocks.get(i), buttonStyleCheckable);
+			}
 			
 			//button from list
 			temp2.addListener(new InputListener(){
@@ -194,7 +208,7 @@ public class LevelEditor implements Screen, GestureListener{
 				}
 			});
 			
-			levelList.add(temp2).left().width(screenWidth * 0.1f).height(screenHeight * 0.15f);
+			levelList.add(temp2).left().width(screenWidth * 0.1f).height(screenWidth * 0.1f);
 			levelList.row();
 		}
 		levelList.top();
@@ -219,6 +233,8 @@ public class LevelEditor implements Screen, GestureListener{
 		skin = new Skin();
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont(Gdx.files.internal("arial_black_72pt.fnt"), false);
+		invisibleFont = new BitmapFont();
+		invisibleFont.setScale(0.00000001f);
 		
 		//Camera stuff
 		testTexture = new Texture("game_background.jpg");
@@ -300,8 +316,8 @@ public class LevelEditor implements Screen, GestureListener{
 
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if(camera.position.x - deltaX > 0 && camera.position.x - deltaX < 1920 * (backgroundTiles - 1)){
-			camera.translate(-deltaX,0);
+		if(camera.position.x - deltaX * 2 > 0 && camera.position.x - deltaX * 2 < 1920 * (backgroundTiles - 1)){
+			camera.translate(-deltaX * 2,0);
 			camera.update();
 		}
 		return false;
