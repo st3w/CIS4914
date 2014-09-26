@@ -21,8 +21,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -44,12 +42,10 @@ public class LevelEditor implements Screen, GestureListener{
 	Skin skin;
 	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
-	Texture tableBackground;
-	Texture gridBackground;
+	Texture tableBackground, gameBackground, gridBackground, immovableBlock;
 	Image backgroundImage, tableBackgroundImage;
 	Vector<Sprite> background = new Vector<Sprite>();
-	int backgroundTiles;
-	int gridTiles;
+	int backgroundTiles, gridTiles, blockTiles;
 	
 	//Button Variables
 	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
@@ -61,7 +57,6 @@ public class LevelEditor implements Screen, GestureListener{
 	
 	//Camera Variables
 	private OrthographicCamera camera;
-	private Texture testTexture;
 	
 	//Constructor
 	public LevelEditor(Level selectedLevel, Blocked game){
@@ -78,10 +73,11 @@ public class LevelEditor implements Screen, GestureListener{
 		stage.act(Gdx.graphics.getDeltaTime());
 	
 		batch.begin();
-		for(int i = 0; i < backgroundTiles + gridTiles; i++)
+		for(int i = 0; i < backgroundTiles + gridTiles + blockTiles; i++)
 		{
 			background.get(i).draw(batch);
 		}
+		
 		batch.end();
 		
 		batch.begin();
@@ -216,7 +212,7 @@ public class LevelEditor implements Screen, GestureListener{
 		}
 		levelList.top();
 	    
-		//Main Menu Button Listener
+		// Main Menu Button Listener
 		mainMenu.addListener(new InputListener(){
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
 				return true;
@@ -239,28 +235,7 @@ public class LevelEditor implements Screen, GestureListener{
 		invisibleFont = new BitmapFont();
 		invisibleFont.setScale(0.00000001f);
 		
-		//Camera stuff
-		testTexture = new Texture("game_background.jpg");
-		backgroundTiles = (int)Math.ceil(selectedLevel.getWidth() / 21);
-		
-		for(int i = 0; i < backgroundTiles; i++){
-			Sprite backgroundSprite = new Sprite(testTexture);
-			backgroundSprite.setOrigin(0,0);
-			backgroundSprite.setPosition((1920 * i) + -backgroundSprite.getWidth()/2,-backgroundSprite.getHeight()/2);
-			background.add(backgroundSprite);
-		}
-		
-		// Grid background 
-		gridBackground = new Texture("grid.png");
-		gridTiles = (int)Math.ceil(selectedLevel.getWidth() / 12);
-		
-		for(int i=0; i < gridTiles; i++)
-		{
-			Sprite gridSprite = new Sprite(gridBackground);
-			gridSprite.setOrigin(0, 0);
-			gridSprite.setPosition((1080 * i) + -1920/2,-gridSprite.getHeight()/2);
-			background.add(gridSprite);
-		}
+		updateMap();
 	}
 
 	@Override
@@ -302,6 +277,46 @@ public class LevelEditor implements Screen, GestureListener{
 			}
 		}
 	}
+	
+	void updateMap(){
+		background.clear();
+		// Add background image to background vector
+		gameBackground = Blocked.manager.get("game_background.jpg");
+		backgroundTiles = (int)Math.ceil(selectedLevel.getWidth() / 21);
+		for(int i = 0; i < backgroundTiles; i++){
+			Sprite backgroundSprite = new Sprite(gameBackground);
+			backgroundSprite.setOrigin(0,0);
+			backgroundSprite.setPosition((1920 * i) + -backgroundSprite.getWidth()/2,-backgroundSprite.getHeight()/2);
+			background.add(backgroundSprite);
+		}
+		
+		// Add blocks to background vector
+		immovableBlock = Blocked.manager.get("bricks/brick.png");
+		blockTiles = 0;
+		for(int i = 0; i < 12; i++){
+			for(int j = 0; j < selectedLevel.getWidth(); j++){
+				if(selectedLevel.getGrid(j, i) == 1){
+					blockTiles++;
+					Sprite blockSprite = new Sprite(immovableBlock);
+					blockSprite.setOrigin(0, 0);
+					blockSprite.setPosition((90 * j) + -1920/2,-(90 * i) + 450);
+					background.add(blockSprite);
+				}
+			}
+		}
+		
+		
+		// Add grid to background vector
+		gridBackground = Blocked.manager.get("grid.png");
+		gridTiles = (int)Math.ceil(selectedLevel.getWidth() / 12);
+		for(int i=0; i < gridTiles; i++)
+		{
+			Sprite gridSprite = new Sprite(gridBackground);
+			gridSprite.setOrigin(0, 0);
+			gridSprite.setPosition((1080 * i) + -1920/2,-gridSprite.getHeight()/2);
+			background.add(gridSprite);
+		}
+	}
 
 	/*******************
 	 * GESTURE DETECTION
@@ -314,6 +329,22 @@ public class LevelEditor implements Screen, GestureListener{
 
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
+		Array<Cell> list = levelList.getCells();
+		
+		int xPos = (int) Math.floor(x * (1920 / screenWidth) + camera.position.x)/90;
+		int yPos = (int) Math.floor(y * (1080 / screenHeight))/90;
+		if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
+			selectedLevel.setGrid(1, xPos, yPos);
+		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
+			// Set to second block
+		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){
+			// Set to third block
+		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(3).getActor()).isChecked()){
+			// Set to fourth block
+		}else if(selectedLevel.getGrid(xPos, yPos) == 1){
+			selectedLevel.setGrid(0, xPos, yPos);
+		}
+		updateMap();
 		return false;
 	}
 
