@@ -45,9 +45,11 @@ public class LevelEditor implements Screen, GestureListener{
 	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
 	Texture tableBackground;
+	Texture gridBackground;
 	Image backgroundImage, tableBackgroundImage;
 	Vector<Sprite> background = new Vector<Sprite>();
 	int backgroundTiles;
+	int gridTiles;
 	
 	//Button Variables
 	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
@@ -76,7 +78,8 @@ public class LevelEditor implements Screen, GestureListener{
 		stage.act(Gdx.graphics.getDeltaTime());
 	
 		batch.begin();
-		for(int i = 0; i < backgroundTiles; i++){
+		for(int i = 0; i < backgroundTiles + gridTiles; i++)
+		{
 			background.get(i).draw(batch);
 		}
 		batch.end();
@@ -245,6 +248,18 @@ public class LevelEditor implements Screen, GestureListener{
 			backgroundSprite.setOrigin(0,0);
 			backgroundSprite.setPosition((1920 * i) + -backgroundSprite.getWidth()/2,-backgroundSprite.getHeight()/2);
 			background.add(backgroundSprite);
+		}
+		
+		// Grid background 
+		gridBackground = new Texture("grid.png");
+		gridTiles = (int)Math.ceil(selectedLevel.getWidth() / 12);
+		
+		for(int i=0; i < gridTiles; i++)
+		{
+			Sprite gridSprite = new Sprite(gridBackground);
+			gridSprite.setOrigin(0, 0);
+			gridSprite.setPosition((1080 * i) + -1920/2,-gridSprite.getHeight()/2);
+			background.add(gridSprite);
 		}
 	}
 
