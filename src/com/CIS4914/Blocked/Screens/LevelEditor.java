@@ -8,6 +8,7 @@ import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,13 +29,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 
-public class LevelEditor implements Screen, GestureListener{
+public class LevelEditor implements Screen, GestureListener {
+	
 	//Base Variables
 	Blocked game;
 	SpriteBatch batch;
 	Stage stage;
+	Stage saveStage;
 	Level selectedLevel;
 	InputMultiplexer input = new InputMultiplexer();
 	
@@ -42,8 +49,8 @@ public class LevelEditor implements Screen, GestureListener{
 	Skin skin;
 	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
-	Texture tableBackground, gameBackground, gridBackground, immovableBlock;
-	Image backgroundImage, tableBackgroundImage;
+	Texture tableBackground, gameBackground, gridBackground, immovableBlock,saveBackground;
+	Image backgroundImage, tableBackgroundImage, saveBackgroundImage;
 	Vector<Sprite> background = new Vector<Sprite>();
 	int backgroundTiles, gridTiles, blockTiles;
 	
@@ -52,11 +59,19 @@ public class LevelEditor implements Screen, GestureListener{
 	TextButton2 mainMenu, pause, save;
 	Table levelList;
 	
+	//TextField
+	TextField textBox;
+	TextFieldStyle textStyle;
+	
 	//Reference Resolution Identifier Variables
 	float screenHeight, screenWidth;
 	
 	//Camera Variables
 	private OrthographicCamera camera;
+	
+	// Game Pause State
+	int state;
+	public static final int GAME_PAUSED = 2; 
 	
 	//Constructor
 	public LevelEditor(Level selectedLevel, Blocked game){
@@ -66,6 +81,7 @@ public class LevelEditor implements Screen, GestureListener{
 	
 	@Override
 	public void render(float delta) {
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -77,16 +93,29 @@ public class LevelEditor implements Screen, GestureListener{
 		{
 			background.get(i).draw(batch);
 		}
-		
 		batch.end();
 		
-		batch.begin();
-		stage.draw();
-		batch.end();
+		
+		// For Save menu
+		if(state == GAME_PAUSED)
+		{
+			batch.begin();
+			stage.draw();
+			saveStage.draw();
+			batch.end();
+		}
+		else
+		{
+			batch.begin();
+			stage.draw();
+			batch.end();
+		}
+		
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		
 		screenHeight = height;
 		screenWidth = width;
 		
@@ -121,15 +150,17 @@ public class LevelEditor implements Screen, GestureListener{
 		
 		stage = new Stage();
 		stage.clear();
+		saveStage = new Stage();
+		saveStage.clear();
 		
 		input.addProcessor(stage);
+		input.addProcessor(saveStage);
 		input.addProcessor(new GestureDetector(this));
 		Gdx.input.setInputProcessor(input);
 		
 		defaultFont.setScale(width * 0.00035f);
 		
 		//Background Textures
-		
 		tableBackground = Blocked.manager.get("table_background.png");
 		tableBackgroundImage = new Image(tableBackground);
 		tableBackgroundImage.setWidth(width * 0.12f);
@@ -137,7 +168,6 @@ public class LevelEditor implements Screen, GestureListener{
 		tableBackgroundImage.setX(width * 0.989f - tableBackgroundImage.getWidth());
 		tableBackgroundImage.setY(height * 0.98f - tableBackgroundImage.getHeight());
 		stage.addActor(tableBackgroundImage);
-		
 		
 		//Button instantiation and adding to stage
         buttonStyle = new TextButtonStyle();
@@ -223,10 +253,49 @@ public class LevelEditor implements Screen, GestureListener{
 			}
 		});
 		
+		// For saving Files 
+		saveBackground = Blocked.manager.get("table_background.png");
+		saveBackgroundImage = new Image(saveBackground);
+		saveBackgroundImage.setWidth(width * 0.4f);
+		saveBackgroundImage.setHeight(height * 0.25f);
+		saveBackgroundImage.setX(width * 0.5f - saveBackgroundImage.getWidth() * 0.5f);
+		saveBackgroundImage.setY(height * 0.5f - saveBackgroundImage.getHeight() * 0.5f);
+		saveStage.addActor(saveBackgroundImage);
+		
+		
+		textStyle = new TextFieldStyle(defaultFont, Color.RED, null, skin.getDrawable("button_down"), null);
+		textBox = new TextField("File Name", textStyle);
+		textBox.setWidth(width * 0.33f);
+		textBox.setHeight(height * 0.11f);
+		textBox.setX(width * 0.5f - textBox.getWidth() * 0.5f);
+		textBox.setY(height * 0.5f - textBox.getHeight() * 0.5f);
+		saveStage.addActor(textBox);
+
+		
+		
+		/*textBox.setTextFieldListener(new TextFieldListener() {
+			@Override
+			public void keyTyped (TextField textBox, char key) {
+				if (key == '\n') textBox.getOnscreenKeyboard().show(false);
+			}
+		});
+		*/
+		
+		// Save button Listener
+		save.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				state = 2; 
+			}
+		});
+		
 	}
 
 	@Override
 	public void show() {
+		
 		batch = new SpriteBatch();
 		textures = new TextureAtlas("textures.atlas");
 		skin = new Skin();
@@ -278,7 +347,7 @@ public class LevelEditor implements Screen, GestureListener{
 		}
 	}
 	
-	void updateMap(){
+	void updateMap() {
 		background.clear();
 		// Add background image to background vector
 		gameBackground = Blocked.manager.get("game_background.jpg");
