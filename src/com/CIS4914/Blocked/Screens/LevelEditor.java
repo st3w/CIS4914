@@ -8,6 +8,7 @@ import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -34,6 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 public class LevelEditor implements Screen, GestureListener {
 	
@@ -56,7 +58,7 @@ public class LevelEditor implements Screen, GestureListener {
 	
 	//Button Variables
 	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
-	TextButton2 mainMenu, pause, save;
+	TextButton2 mainMenu, pause, save, saveMenu;
 	Table levelList;
 	
 	//TextField
@@ -70,8 +72,12 @@ public class LevelEditor implements Screen, GestureListener {
 	private OrthographicCamera camera;
 	
 	// Game Pause State
-	int state;
-	public static final int GAME_PAUSED = 2; 
+	private int state;
+	public static final int GAME_SAVE = 2; 
+	
+	// Json to save file in local directory
+	private Json json;
+	private FileHandle saveFile;
 	
 	//Constructor
 	public LevelEditor(Level selectedLevel, Blocked game){
@@ -97,7 +103,7 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		
 		// For Save menu
-		if(state == GAME_PAUSED)
+		if(state == GAME_SAVE)
 		{
 			batch.begin();
 			stage.draw();
@@ -193,10 +199,12 @@ public class LevelEditor implements Screen, GestureListener {
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
 		pause = new TextButton2("Pause", buttonStyle, screenWidth * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
 		save = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + (buttonWidth + width * 0.02f) * 2f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		saveMenu = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + (buttonWidth + width * 0.02f) * 2f, height - buttonHeight - width * 0.100f, buttonWidth, buttonHeight);
 		
 		stage.addActor(mainMenu);		
 		stage.addActor(pause);
 		stage.addActor(save);
+		saveStage.addActor(saveMenu);
 
 		//Scrollable List
 		levelList = new Table(skin);	
@@ -270,6 +278,8 @@ public class LevelEditor implements Screen, GestureListener {
 		textBox.setX(width * 0.5f - textBox.getWidth() * 0.5f);
 		textBox.setY(height * 0.5f - textBox.getHeight() * 0.5f);
 		saveStage.addActor(textBox);
+		
+		json = new Json();
 
 		
 		
@@ -287,7 +297,20 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				state = 2; 
+				 state = 2;
+			}
+		});
+		
+		// save file button
+		saveMenu.addListener(new InputListener() {
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				String file = json.toJson(selectedLevel);
+				saveFile = Gdx.files.local(textBox.getText());
+				saveFile.writeString(file, true);	//True means append, false means overwrite
+				state = 0;
 			}
 		});
 		
