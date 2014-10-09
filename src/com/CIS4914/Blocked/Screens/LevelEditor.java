@@ -72,8 +72,9 @@ public class LevelEditor implements Screen, GestureListener {
 	private OrthographicCamera camera;
 	
 	// Game Pause State
-	private int state;
-	public static final int GAME_SAVE = 2; 
+	private int gameState;
+	public static final int GAME_RUNNING = 0;
+	public static final int GAME_SAVE = 1; 
 	
 	// Json to save file in local directory
 	private Json json;
@@ -87,36 +88,29 @@ public class LevelEditor implements Screen, GestureListener {
 	
 	@Override
 	public void render(float delta) {
-		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 	    batch.setProjectionMatrix(camera.combined);
 		stage.act(Gdx.graphics.getDeltaTime());
-	
+		
 		batch.begin();
-		for(int i = 0; i < backgroundTiles + gridTiles + blockTiles; i++)
-		{
+		for(int i = 0; i < backgroundTiles + gridTiles + blockTiles; i++){
 			background.get(i).draw(batch);
 		}
 		batch.end();
 		
-		
 		// For Save menu
-		if(state == GAME_SAVE)
-		{
+		if(gameState == GAME_SAVE){
 			batch.begin();
 			stage.draw();
 			saveStage.draw();
 			batch.end();
-		}
-		else
-		{
+		} else{
 			batch.begin();
 			stage.draw();
 			batch.end();
 		}
-		
 	}
 
 	@Override
@@ -159,8 +153,9 @@ public class LevelEditor implements Screen, GestureListener {
 		saveStage = new Stage();
 		saveStage.clear();
 		
+
+		
 		input.addProcessor(stage);
-		input.addProcessor(saveStage);
 		input.addProcessor(new GestureDetector(this));
 		Gdx.input.setInputProcessor(input);
 		
@@ -176,33 +171,18 @@ public class LevelEditor implements Screen, GestureListener {
 		stage.addActor(tableBackgroundImage);
 		
 		//Button instantiation and adding to stage
-        buttonStyle = new TextButtonStyle();
-		buttonStyle.up = skin.getDrawable("button_up");
-		buttonStyle.down = skin.getDrawable("button_down");
-		buttonStyle.font = defaultFont;
-		
-		buttonStyleCheckable = new TextButtonStyle();
-		buttonStyleCheckable.up = skin.getDrawable("button_up");
-		buttonStyleCheckable.down = skin.getDrawable("button_down");
-		buttonStyleCheckable.checked = skin.getDrawable("button_down");
-		buttonStyleCheckable.font = defaultFont;
-		
-		blockButtonStyle = new TextButtonStyle();
-		blockButtonStyle.up = skin.getDrawable("brick_button_up");
-		blockButtonStyle.down = skin.getDrawable("brick_button_down");
-		blockButtonStyle.checked = skin.getDrawable("brick_button_down");
-		blockButtonStyle.font = invisibleFont;
+        buttonStyle = new TextButtonStyle(skin.getDrawable("button_up"), skin.getDrawable("button_down"), null, defaultFont);
+		buttonStyleCheckable = new TextButtonStyle(skin.getDrawable("button_up"), skin.getDrawable("button_down"), skin.getDrawable("button_down"), defaultFont);
+		blockButtonStyle = new TextButtonStyle(skin.getDrawable("brick_button_up"), skin.getDrawable("brick_button_down"), skin.getDrawable("brick_button_down"), invisibleFont);
 		
 		float buttonWidth = width * 0.18f;
 		float buttonHeight = width * 0.06f;
 		
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		pause = new TextButton2("Pause", buttonStyle, screenWidth * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		save = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + (buttonWidth + width * 0.02f) * 2f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		save = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
 		saveMenu = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + (buttonWidth + width * 0.02f) * 2f, height - buttonHeight - width * 0.100f, buttonWidth, buttonHeight);
 		
 		stage.addActor(mainMenu);		
-		stage.addActor(pause);
 		stage.addActor(save);
 		saveStage.addActor(saveMenu);
 
@@ -278,18 +258,7 @@ public class LevelEditor implements Screen, GestureListener {
 		textBox.setX(width * 0.5f - textBox.getWidth() * 0.5f);
 		textBox.setY(height * 0.5f - textBox.getHeight() * 0.5f);
 		saveStage.addActor(textBox);
-		
-		json = new Json();
 
-		
-		
-		/*textBox.setTextFieldListener(new TextFieldListener() {
-			@Override
-			public void keyTyped (TextField textBox, char key) {
-				if (key == '\n') textBox.getOnscreenKeyboard().show(false);
-			}
-		});
-		*/
 		
 		// Save button Listener
 		save.addListener(new InputListener(){
@@ -297,7 +266,7 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				 state = 2;
+				saveGame();
 			}
 		});
 		
@@ -307,10 +276,55 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				String file = json.toJson(selectedLevel);
-				saveFile = Gdx.files.local(textBox.getText());
-				saveFile.writeString(file, true);	//True means append, false means overwrite
-				state = 0;
+				
+				selectedLevel.setName(textBox.getText());
+				String currentSave = json.toJson(selectedLevel);
+				saveFile = Gdx.files.local("customLevels");
+				
+				if(saveFile.exists()){
+					String customLevelString = saveFile.readString();
+					String[] customLevelArray = customLevelString.split("\n");
+					Level[] levelArray = new Level[customLevelArray.length];
+
+					for(int i = 0; i < customLevelArray.length; i++){			
+						levelArray[i] = json.fromJson(Level.class, (String) customLevelArray[i]);
+					}
+					
+					Boolean nameConflict = false;
+
+					
+					for(int i = 0; i < levelArray.length; i++){			
+						if(selectedLevel.getName().equals(levelArray[i].getName())){
+							nameConflict = true;
+						}
+					}
+
+
+
+					if(nameConflict){
+						for(int i = 0; i < levelArray.length; i++){
+							String levelSave = json.toJson(levelArray[i]);
+							if(i == 0){ // in the first iteration need to overwrite
+								if(selectedLevel.getName().equals(levelArray[i].getName())){
+									saveFile.writeString(currentSave + "\n", false);
+								} else{
+									saveFile.writeString(levelSave + "\n", false);
+								}
+							} else{
+								if(selectedLevel.getName().equals(levelArray[i].getName())){
+									saveFile.writeString(currentSave + "\n", true);
+								} else{
+									saveFile.writeString(levelSave + "\n", true);
+								}
+							}
+						}
+					} else{
+						saveFile.writeString(currentSave + "\n", true);
+					}
+				} else{
+					saveFile.writeString(currentSave + "\n", true);
+				}
+				resumeGame();
 			}
 		});
 		
@@ -326,6 +340,7 @@ public class LevelEditor implements Screen, GestureListener {
 		defaultFont = new BitmapFont(Gdx.files.internal("arial_black_72pt.fnt"), false);
 		invisibleFont = new BitmapFont();
 		invisibleFont.setScale(0.00000001f);
+		json = new Json();
 		
 		updateMap();
 	}
@@ -356,6 +371,16 @@ public class LevelEditor implements Screen, GestureListener {
 		defaultFont.dispose();
 		textures.dispose();
 		stage.dispose();
+	}
+	
+	public void saveGame() {
+		gameState = GAME_SAVE;
+		Gdx.input.setInputProcessor(saveStage);
+	}
+	
+	public void resumeGame() {
+		gameState = GAME_RUNNING;
+		Gdx.input.setInputProcessor(input);
 	}
 	
 	/*	updateList Method: Takes the table and updates it by getting the cells, 

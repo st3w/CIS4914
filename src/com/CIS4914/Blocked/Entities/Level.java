@@ -10,6 +10,10 @@ public class Level {
 	private float levelWidth;
 	
 	// constructor
+	public Level(){
+		
+	}
+	
 	public Level(String name, int width){
 		this.name = name;
 		levelWidth = width;
