@@ -251,7 +251,7 @@ public class LevelEditor implements Screen, GestureListener {
 		saveStage.addActor(saveBackgroundImage);
 		
 		
-		textStyle = new TextFieldStyle(defaultFont, Color.RED, null, skin.getDrawable("button_down"), null);
+		textStyle = new TextFieldStyle(defaultFont, Color.RED, skin.getDrawable("cursor"), skin.getDrawable("button_down"), null);
 		textBox = new TextField("File Name", textStyle);
 		textBox.setWidth(width * 0.33f);
 		textBox.setHeight(height * 0.11f);
@@ -276,6 +276,8 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				
+				textBox.next(true);
 				
 				selectedLevel.setName(textBox.getText());
 				String currentSave = json.toJson(selectedLevel);
