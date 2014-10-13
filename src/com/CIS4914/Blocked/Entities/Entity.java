@@ -1,57 +1,42 @@
 package com.CIS4914.Blocked.Entities;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 //Entity class for objects in game
-public class Entity 
+public class Entity extends Actor
 {
-	// Parameters
-	private String name;
-	Rectangle bounds;
-	Texture tex;
+	Rectangle bounds; // Bounding rectangle, relative to the position
+	Vector2 position; // Absolute position of bottom left in world coordinates
+	TextureRegion texReg;
 	
 	// Default Constructor for Entity class
-	public Entity(String name, Rectangle objBound, Texture objTex)
+	public Entity(Rectangle objBound, TextureRegion objTex)
 	{
-		this.name = name;
 		this.bounds = objBound;
-		this.tex = objTex;	
-	}
-	
-	/* Get & Set methods for class parameters */
-	
-	public String getName()
-	{
-		return this.name;
-	}
-	
-	public void setName(String newName)
-	{
-		this.name = newName;
+		this.texReg = objTex;
+		this.position = new Vector2();
 	}
 	
 	// get x position of obj 
-	public int getX()
+	public float getX()
 	{
-		return (int) bounds.getX();
+		return bounds.getX();
 	}
 	
 	// get y position of obj
-	public int getY()
+	public float getY()
 	{
-		return (int) bounds.getY();
+		return bounds.getY();
 	}
 	
 	// sets position of grid x & y for Rectangle obj
 	public void setPos(int x, int y)
 	{
 		this.bounds.setPosition(x, y);
-	}
-	
-	public Rectangle getBounds()
-	{
-		return this.bounds;
 	}
 	
 	public void setBounds(Rectangle obj)

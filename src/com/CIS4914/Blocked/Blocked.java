@@ -22,6 +22,7 @@ public class Blocked extends Game {
 	   	manager.load("main_menu_background.png", Texture.class);
 		manager.load("menu_background.png", Texture.class);
 		manager.load("table_background.png", Texture.class);
+		manager.load("generic.png", Texture.class);
 		manager.finishLoading();
 		
         mainMenuScreen = new MainMenu(this);

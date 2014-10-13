@@ -234,7 +234,7 @@ public class GameMenu implements Screen{
 				Level selectedLevel = null;
 				
 				if(mainGameMap.isChecked()){
-					
+					mapSelected = true;
 				} else if(customMap.isChecked()){
 					
 				} else{
@@ -243,7 +243,7 @@ public class GameMenu implements Screen{
 				
 				
 				if(mapSelected){
-					((Blocked) Gdx.app.getApplicationListener()).setScreen(new LevelEditor(selectedLevel, game)); 
+					game.setScreen(new GameScreen(new Level("Test Level", 100), game));
 				}
 			}
 		});
