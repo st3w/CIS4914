@@ -3,10 +3,9 @@ package com.CIS4914.Blocked.Screens;
 import java.util.ArrayList;
 
 import com.CIS4914.Blocked.Blocked;
-import com.CIS4914.Blocked.Entities.DynamicEntity;
+import com.CIS4914.Blocked.Entities.Entity;
 import com.CIS4914.Blocked.Entities.Level;
 import com.CIS4914.Blocked.Entities.Player;
-import com.CIS4914.Blocked.Entities.StaticEntity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -34,8 +33,7 @@ public class GameScreen implements Screen {
 	private Stage stage;
 	private Blocked game;
 	private Image background;
-	private ArrayList<StaticEntity> staticEntities;
-	private ArrayList<DynamicEntity> dynamicEntities;
+	private ArrayList<Entity> entities;
 	private Player player;
 	
 	public GameScreen(Level selectedLevel, Blocked game) {
@@ -63,7 +61,7 @@ public class GameScreen implements Screen {
 		// Update each DynamicEntity's position
 		// If the math doesn't make sense, see 
 		// http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
-		for (DynamicEntity ent : dynamicEntities) {
+		for (Entity ent : entities) {
 			ent.accel.y = -gravity;
 			ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
 			ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
@@ -79,8 +77,8 @@ public class GameScreen implements Screen {
 				ent.vel.y = 0;
 		}
 		
-		for (DynamicEntity ent1 : dynamicEntities) {
-			for (DynamicEntity ent2 : dynamicEntities) {
+		for (Entity ent1 : entities) {
+			for (Entity ent2 : entities) {
 				
 			}
 		}
@@ -118,8 +116,8 @@ public class GameScreen implements Screen {
 
 		player = new Player(new Rectangle(0, 700, 196, 196), Blocked.manager.get("generic.png", Texture.class));
 		
-		dynamicEntities = new ArrayList<DynamicEntity>();
-		dynamicEntities.add(player);
+		entities = new ArrayList<Entity>();
+		entities.add(player);
 		stage.addActor(player);
 		Gdx.input.setInputProcessor(stage);
 		

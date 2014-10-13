@@ -1,47 +1,59 @@
 package com.CIS4914.Blocked.Entities;
 
+import com.CIS4914.Blocked.Blocked;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-//Entity class for objects in game
-public class Entity extends Actor
-{
-	Rectangle bounds; // Bounding rectangle, relative to the position
-	Vector2 position; // Absolute position of bottom left in world coordinates
-	TextureRegion texReg;
+// StaticEntity is just an Actor with a TextureRegions
+public class Entity extends Actor {
+
+	TextureRegion tex;
+	public Vector2 vel;
+	public Vector2 accel;
+	boolean isMovable;
 	
-	// Default Constructor for Entity class
-	public Entity(Rectangle objBound, TextureRegion objTex)
-	{
-		this.bounds = objBound;
-		this.texReg = objTex;
-		this.position = new Vector2();
-	}
-	
-	// get x position of obj 
-	public float getX()
-	{
-		return bounds.getX();
-	}
-	
-	// get y position of obj
-	public float getY()
-	{
-		return bounds.getY();
-	}
-	
-	// sets position of grid x & y for Rectangle obj
-	public void setPos(int x, int y)
-	{
-		this.bounds.setPosition(x, y);
-	}
-	
-	public void setBounds(Rectangle obj)
-	{
-		this.bounds = obj;
+	public Entity(Rectangle bounds, TextureRegion tex, boolean isMovable) {
+		this.tex = tex;
+		setWidth(bounds.width);
+		setHeight(bounds.height);
+		setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+		this.isMovable = isMovable;
+		vel = new Vector2();
+		accel = new Vector2();
 	}
 
+	public Entity(Rectangle bounds, TextureRegion tex) {
+		this.tex = tex;
+		setWidth(bounds.width);
+		setHeight(bounds.height);
+		setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+		isMovable = false;
+		vel = new Vector2();
+		accel = new Vector2();
+	}
+	
+	public Entity(TextureRegion tex) {
+		this.tex = tex;
+		setWidth(64);
+		setHeight(64);
+		setBounds(0, 0, 64, 64);
+		isMovable = false;
+		vel = new Vector2();
+		accel = new Vector2();
+	}
+	
+	public Entity() {
+		tex = new TextureRegion(Blocked.manager.get("generic.png", Texture.class));
+		setWidth(64);
+		setHeight(64);
+		setBounds(0, 0, 64, 64);
+		isMovable = false;
+		vel = new Vector2();
+		accel = new Vector2();
+	}
+	
+	public boolean isMovable() { return this.isMovable; }
 }

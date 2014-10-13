@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Player extends DynamicEntity {
+public class Player extends Entity {
 	// Player states
 	static final int STAND_RIGHT = 0;
 	static final int STAND_LEFT = 1;
@@ -34,7 +34,7 @@ public class Player extends DynamicEntity {
 	public boolean isJumpButtonDown;
 	
 	public Player(Rectangle objBound, Texture playerTex) {
-		super(objBound, new TextureRegion(playerTex));
+		super(objBound, new TextureRegion(playerTex), true);
 		TextureRegion[][] frames = TextureRegion.split(playerTex, 
 													playerTex.getWidth() / SHEET_COLS,
 													playerTex.getHeight() / SHEET_ROWS);

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 // Block class for block entities in game
-public class Block extends StaticEntity
+public class Block extends Entity
 {
 	// Parameters
 	private String type;
