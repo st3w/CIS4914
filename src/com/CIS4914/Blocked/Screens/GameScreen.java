@@ -56,25 +56,13 @@ public class GameScreen implements Screen {
 
 	public void updateWorld(float delta)
 	{
-		final float gravity = 1500;
-		
 		// Update each DynamicEntity's position
 		// If the math doesn't make sense, see 
 		// http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
 		for (Entity ent : entities) {
-			ent.accel.y = -gravity;
-			ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
-			ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-			float newX = ent.getX() + ent.vel.x * delta;
-			float newY = ent.getY() + ent.vel.y * delta;
-			newX = MathUtils.clamp(newX, 0, 9000);
-			newY = MathUtils.clamp(newY, 0, 1080);
-			ent.setX(newX);
-			ent.setY(newY);
-			ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
-			ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-			if (ent.getY() == 0)
-				ent.vel.y = 0;
+			if (!ent.isMovable()) 
+				continue;
+			moveEntity(ent, delta);
 		}
 		
 		for (Entity ent1 : entities) {
@@ -84,10 +72,31 @@ public class GameScreen implements Screen {
 		}
 	}
 	
+	public void moveEntity(Entity ent, float delta) {
+		final float gravity = 4000;
+		final float maxSpeed = 1200;
+		
+		ent.accel.y = -gravity;
+		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
+		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
+		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
+		float newX = ent.getX() + ent.vel.x * delta;
+		float newY = ent.getY() + ent.vel.y * delta;
+		newX = MathUtils.clamp(newX, 0 - ent.getHitBox().getX(), 9000);
+		newY = MathUtils.clamp(newY, 0, 1080);
+		ent.setX(newX);
+		ent.setY(newY);
+		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
+		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
+		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
+		if (ent.getY() == 0)
+			ent.vel.y = 0;
+	}
+	
 	public void updateCamera() {
-		if (player.getY() >= 400)
+		if (player.getY() > stage.getCamera().viewportHeight / 2)
 			stage.getCamera().position.y = player.getY();
-		if (player.getY() <= 400)
+		if (player.getY() <= stage.getCamera().viewportHeight / 2)
 			stage.getCamera().position.y = stage.getCamera().viewportHeight / 2;
 		stage.getCamera().position.x = MathUtils.clamp(stage.getCamera().position.x, 
 				stage.getCamera().viewportWidth / 2, 
@@ -114,7 +123,7 @@ public class GameScreen implements Screen {
 		background = new Image(backgroundRegion);
 		stage.addActor(background);
 
-		player = new Player(new Rectangle(0, 700, 196, 196), Blocked.manager.get("generic.png", Texture.class));
+		player = new Player(new Rectangle(160, 0, 180, 196), new Rectangle(0, 700, 196, 196), Blocked.manager.get("generic.png", Texture.class));
 		
 		entities = new ArrayList<Entity>();
 		entities.add(player);

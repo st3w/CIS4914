@@ -33,8 +33,8 @@ public class Player extends Entity {
 	public boolean isRightButtonDown;
 	public boolean isJumpButtonDown;
 	
-	public Player(Rectangle objBound, Texture playerTex) {
-		super(objBound, new TextureRegion(playerTex), true);
+	public Player(Rectangle hitBox, Rectangle objBound, Texture playerTex) {
+		super(hitBox, objBound, new TextureRegion(playerTex), true);
 		TextureRegion[][] frames = TextureRegion.split(playerTex, 
 													playerTex.getWidth() / SHEET_COLS,
 													playerTex.getHeight() / SHEET_ROWS);
@@ -77,19 +77,31 @@ public class Player extends Entity {
 
 	@Override
 	public void act(float delta) {
-		if (isLeftButtonDown) {
-			accel.x = 500;
+		final float runAccel = 2000;
+		float friction = 2500 * delta;
+		
+		if (isRightButtonDown) {
+			accel.x = runAccel;
 		}
-		if (isRightButtonDown)
-			accel.x = -500;
-		if (!isLeftButtonDown && !isRightButtonDown)
+		if (isLeftButtonDown)
+			accel.x = -runAccel;
+		if (!isLeftButtonDown && !isRightButtonDown) {
 			accel.x = 0;
+			if (vel.x < friction && vel.x > -friction) {
+				vel.x = 0;
+			} else {
+				if (vel.x > 0)
+					vel.x = vel.x - friction;
+				else
+					vel.x = vel.x + friction;
+			}
+		}
 		if (isJumpButtonDown && ((state != JUMP_RIGHT) && (state != JUMP_LEFT))) {
-			vel.y = 500;
-			if (state == STAND_RIGHT || state == RUN_RIGHT)
-				state = JUMP_RIGHT;
-			else if (state == STAND_LEFT || state == RUN_RIGHT)
-				state = JUMP_LEFT;
+			vel.y = 1500;
+//			if (state == STAND_RIGHT || state == RUN_RIGHT)
+//				state = JUMP_RIGHT;
+//			else if (state == STAND_LEFT || state == RUN_RIGHT)
+//				state = JUMP_LEFT;
 		}
 	}
 }

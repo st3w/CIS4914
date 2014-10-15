@@ -13,23 +13,39 @@ public class Entity extends Actor {
 	TextureRegion tex;
 	public Vector2 vel;
 	public Vector2 accel;
+	Rectangle hitBox; 
 	boolean isMovable;
 	
-	public Entity(Rectangle bounds, TextureRegion tex, boolean isMovable) {
+	public Entity(Rectangle hitBox, Rectangle texBounds, TextureRegion tex, boolean isMovable) {
 		this.tex = tex;
-		setWidth(bounds.width);
-		setHeight(bounds.height);
-		setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+		this.hitBox = hitBox;
+		this.hitBox.setX(hitBox.getX() + getX());
+		this.hitBox.setY(hitBox.getY() + getY());
+		setWidth(texBounds.width);
+		setHeight(texBounds.height);
+		setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
+		this.isMovable = isMovable;
+		vel = new Vector2();
+		accel = new Vector2();
+	}
+	
+	public Entity(Rectangle texBounds, TextureRegion tex, boolean isMovable) {
+		this.tex = tex;
+		this.hitBox = texBounds;
+		setWidth(texBounds.width);
+		setHeight(texBounds.height);
+		setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
 		this.isMovable = isMovable;
 		vel = new Vector2();
 		accel = new Vector2();
 	}
 
-	public Entity(Rectangle bounds, TextureRegion tex) {
+	public Entity(Rectangle texBounds, TextureRegion tex) {
 		this.tex = tex;
-		setWidth(bounds.width);
-		setHeight(bounds.height);
-		setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+		this.hitBox = texBounds;
+		setWidth(texBounds.width);
+		setHeight(texBounds.height);
+		setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
 		isMovable = false;
 		vel = new Vector2();
 		accel = new Vector2();
@@ -37,6 +53,7 @@ public class Entity extends Actor {
 	
 	public Entity(TextureRegion tex) {
 		this.tex = tex;
+		this.hitBox = new Rectangle(0, 0, 64, 64);
 		setWidth(64);
 		setHeight(64);
 		setBounds(0, 0, 64, 64);
@@ -56,4 +73,20 @@ public class Entity extends Actor {
 	}
 	
 	public boolean isMovable() { return this.isMovable; }
+	
+	public Rectangle getHitBox() { 
+		return hitBox;
+	}
+	
+	@Override
+	public void setX(float x) {
+		hitBox.setX(x + hitBox.getX() - getX());
+		super.setX(x);
+	}
+	
+	@Override
+	public void setY(float y) {
+		hitBox.setY(y + hitBox.getY() - getY());
+		super.setY(y);
+	}
 }
