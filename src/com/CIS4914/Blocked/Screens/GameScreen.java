@@ -3,6 +3,7 @@ package com.CIS4914.Blocked.Screens;
 import java.util.ArrayList;
 
 import com.CIS4914.Blocked.Blocked;
+import com.CIS4914.Blocked.Entities.Block;
 import com.CIS4914.Blocked.Entities.Entity;
 import com.CIS4914.Blocked.Entities.Level;
 import com.CIS4914.Blocked.Entities.Player;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.MathUtils;
@@ -36,8 +38,11 @@ public class GameScreen implements Screen {
 	private ArrayList<Entity> entities;
 	private Player player;
 	
+	private Level selectedLevel;
+	
 	public GameScreen(Level selectedLevel, Blocked game) {
 		this.game = game;
+		this.selectedLevel = selectedLevel;
 	}
 	
 	@Override
@@ -105,7 +110,7 @@ public class GameScreen implements Screen {
 				9000 - stage.getCamera().position.x);
 		
 		stage.getCamera().position.y = MathUtils.clamp(stage.getCamera().position.y,
-														0, 540);
+														0, 1080-stage.getCamera().viewportHeight/2);
 		stage.getCamera().update();
 		// ((OrthographicCamera) stage.getCamera()).translate(5,0);
 	}
@@ -113,6 +118,16 @@ public class GameScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
+		
+
+		for(int i = 0; i < 12; i++){
+			for(int j = 0; j < selectedLevel.getWidth(); j++){
+				if(selectedLevel.getGrid(j,i) == 1){
+					Block immovableBlock = new Block(new Rectangle(90 * j, 1080 - (90 * (i + 1)), 90, 90), Blocked.manager.get("bricks/brick.png", Texture.class), "Immovable Block");
+					stage.addActor(immovableBlock);
+				}
+			}
+		}
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.CIS4914.Blocked.Entities;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -15,6 +16,10 @@ public class Block extends Entity
 	{
 		super(objBound, new TextureRegion(objTex));
 		this.type = type;
+	}
+	
+	public void draw(Batch batch, float alpha){
+		batch.draw(tex, getX(), getY(),  getWidth(), getHeight());
 	}
 	
 	// Gets type

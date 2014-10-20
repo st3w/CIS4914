@@ -7,7 +7,7 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "V0.00.07 Pre-Alpha (Editor Saving and Loading, Delete level button added and functional)";
+	public static final String version = "V0.00.08 Pre-Alpha (custom levels populated in game menu and also load blocks into game)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
 	

@@ -7,6 +7,7 @@ import com.CIS4914.Blocked.Controllers.TextButton2;
 import com.CIS4914.Blocked.Entities.Level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 public class GameMenu implements Screen{
 	//Base Variables
@@ -45,6 +47,10 @@ public class GameMenu implements Screen{
 	TextButtonStyle buttonStyle, buttonStyleCheckable;
 	TextButton2 mainGameMap, customMap, load, mainMenu;
 	Table levelList;
+	
+	//Other
+	Json json;
+	private FileHandle saveFile;
 	
 	//Reference Resolution Identifier Variables
 	float screenHeight, screenWidth;
@@ -82,23 +88,25 @@ public class GameMenu implements Screen{
 		mainLevels.add("Level 5");
 		mainLevels.add("Level 6");
 		
-		customLevels.add("Pit's fallow");
-		customLevels.add("Fire city");
-		customLevels.add("Custom Level 3");
-		customLevels.add("Custom level 1");	
-		customLevels.add("Blue terror");
-		customLevels.add("Satin's dungeon");
-		customLevels.add("the keymaster's lair");
-		customLevels.add("Happy rainbow fairy land");	
-		customLevels.add("Garden of eatin'");
-		customLevels.add("super fun time level");
-		customLevels.add("Calipsow's end");
-		customLevels.add("the furrow");	
-		customLevels.add("Temple of undending wruin");	
-		customLevels.add("Dark's den");	
-		customLevels.add("white shoes are cool");	
-		//TEMPORARY
+		Level[] levelArray = null;
 		
+		saveFile = Gdx.files.local("customLevels");
+		if(saveFile.exists()){
+			String customLevelString = saveFile.readString();
+
+			String[] customLevelArray = customLevelString.split("\n");
+
+			levelArray = new Level[customLevelArray.length];
+
+			for(int i = 0; i < customLevelArray.length; i++){	
+				levelArray[i] = json.fromJson(Level.class, (String) customLevelArray[i]);
+				customLevels.add(levelArray[i].getName());
+			}
+
+		}
+		
+		final Level[] levels = levelArray;
+
 		stage = new Stage();
 		stage.clear();
 		
@@ -234,16 +242,29 @@ public class GameMenu implements Screen{
 				Level selectedLevel = null;
 				
 				if(mainGameMap.isChecked()){
-					mapSelected = true;
-				} else if(customMap.isChecked()){
 					
+				} else if(customMap.isChecked()){
+					Array<Cell> list = levelList.getCells();
+					for(int i = 0; i < customLevels.size(); i++){
+						TextButton currentButton = ((TextButton) list.get(i).getActor());
+						String buttonText = currentButton.getText().toString();
+						if(currentButton.isChecked()){
+							if(buttonText.equals(levels[i].getName())){
+								mapSelected = true;
+								selectedLevel = levels[i];
+							} else{
+								System.out.println("no map selected");
+							}
+						}
+						
+					}
 				} else{
 					System.out.println("no category selected");
 				}
 				
 				
 				if(mapSelected){
-					game.setScreen(new GameScreen(new Level("Test Level", 100), game));
+					game.setScreen(new GameScreen(selectedLevel, game));
 				}
 			}
 		});
@@ -269,6 +290,7 @@ public class GameMenu implements Screen{
 		skin.addRegions(textures);
 		defaultFont = new BitmapFont(Gdx.files.internal("arial_black_72pt.fnt"), false);
 		
+		json = new Json();
 	}
 
 	@Override
