@@ -64,15 +64,9 @@ public class Player extends Entity {
 		case STAND_RIGHT:
 			batch.draw(standFrame, getX(), getY(), getWidth(), getHeight());
 			break;
-		case STAND_LEFT:
-			standFrame.flip(true, false);
+		default:
 			batch.draw(standFrame, getX(), getY(), getWidth(), getHeight());
-			standFrame.flip(true, false);
-			break;
-		case JUMP_RIGHT:
-			
 		}
-		
 	}
 
 	@Override
@@ -80,9 +74,10 @@ public class Player extends Entity {
 		final float runAccel = 2000;
 		float friction = 2500 * delta;
 		
-		if (isRightButtonDown) {
+		stateTime += delta;
+		
+		if (isRightButtonDown)
 			accel.x = runAccel;
-		}
 		if (isLeftButtonDown)
 			accel.x = -runAccel;
 		if (!isLeftButtonDown && !isRightButtonDown) {
@@ -96,12 +91,7 @@ public class Player extends Entity {
 					vel.x = vel.x + friction;
 			}
 		}
-		if (isJumpButtonDown && ((state != JUMP_RIGHT) && (state != JUMP_LEFT))) {
-			vel.y = 1500;
-//			if (state == STAND_RIGHT || state == RUN_RIGHT)
-//				state = JUMP_RIGHT;
-//			else if (state == STAND_LEFT || state == RUN_RIGHT)
-//				state = JUMP_LEFT;
-		}
+		if (isJumpButtonDown && vel.y == 0)
+			vel.y = 2000;
 	}
 }

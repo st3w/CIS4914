@@ -98,6 +98,8 @@ public class GameScreen implements Screen {
 			stage.getCamera().position.y = player.getY();
 		if (player.getY() <= stage.getCamera().viewportHeight / 2)
 			stage.getCamera().position.y = stage.getCamera().viewportHeight / 2;
+		stage.getCamera().position.x = player.getHitBox().x;
+		
 		stage.getCamera().position.x = MathUtils.clamp(stage.getCamera().position.x, 
 				stage.getCamera().viewportWidth / 2, 
 				9000 - stage.getCamera().position.x);
