@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player extends Entity {
@@ -33,6 +35,8 @@ public class Player extends Entity {
 	public boolean isRightButtonDown;
 	public boolean isJumpButtonDown;
 	
+	ShapeRenderer shapeRenderer;
+	
 	public Player(Rectangle hitBox, Rectangle objBound, Texture playerTex) {
 		super(hitBox, objBound, new TextureRegion(playerTex), true);
 		TextureRegion[][] frames = TextureRegion.split(playerTex, 
@@ -54,18 +58,21 @@ public class Player extends Entity {
 		runAnimation = new Animation(1/15f, runFrames);
 		jumpAnimation = new Animation(1/15f, jumpFrames);
 		state = STAND_RIGHT;
+		
 		isLeftButtonDown = false;
 		isRightButtonDown = false;
 		isJumpButtonDown = false;
+		
+		shapeRenderer = new ShapeRenderer();
 	}
 	
 	public void draw(Batch batch, float alpha) {
 		switch (state) {
 		case STAND_RIGHT:
-			batch.draw(standFrame, getX(), getY(), getWidth(), getHeight());
+			batch.draw(standFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 			break;
 		default:
-			batch.draw(standFrame, getX(), getY(), getWidth(), getHeight());
+			batch.draw(standFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 		}
 	}
 
@@ -92,6 +99,6 @@ public class Player extends Entity {
 			}
 		}
 		if (isJumpButtonDown && vel.y == 0)
-			vel.y = 2000;
+			vel.y = 2200;
 	}
 }

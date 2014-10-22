@@ -14,8 +14,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -40,9 +43,12 @@ public class GameScreen implements Screen {
 	
 	private Level selectedLevel;
 	
+	private ShapeRenderer shapeRenderer;
+	
 	public GameScreen(Level selectedLevel, Blocked game) {
 		this.game = game;
 		this.selectedLevel = selectedLevel;
+		shapeRenderer = new ShapeRenderer();
 	}
 	
 	@Override
@@ -55,8 +61,13 @@ public class GameScreen implements Screen {
 			updateWorld(delta);
 			updateCamera();
 			stage.draw();
+			
+			shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(1, 1, 0, 1);
+			shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+			shapeRenderer.end();
 		}
-		
 	}
 
 	public void updateWorld(float delta)
@@ -68,12 +79,7 @@ public class GameScreen implements Screen {
 			if (!ent.isMovable()) 
 				continue;
 			moveEntity(ent, delta);
-		}
-		
-		for (Entity ent1 : entities) {
-			for (Entity ent2 : entities) {
-				
-			}
+			borderCollide(ent);
 		}
 	}
 	
@@ -85,17 +91,37 @@ public class GameScreen implements Screen {
 		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
 		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
 		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
-		float newX = ent.getX() + ent.vel.x * delta;
-		float newY = ent.getY() + ent.vel.y * delta;
-		newX = MathUtils.clamp(newX, 0 - ent.getHitBox().getX(), 9000);
-		newY = MathUtils.clamp(newY, 0, 1080);
-		ent.setX(newX);
-		ent.setY(newY);
+		ent.setX(ent.getX() + ent.vel.x * delta);
+		ent.setY(ent.getY() + ent.vel.y * delta);
 		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
 		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
 		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
-		if (ent.getY() == 0)
+	}
+	
+	public void borderCollide(Entity ent) {
+		// We only care about
+		if (!ent.isMovable())
+			return;
+		
+		// Off the left end of the screen
+		if (ent.getX() < 0) {
+			ent.setX(0);
+			ent.vel.x = 0;
+			ent.accel.x = 0;
+		}
+		
+		if (ent.getY() < 0) {
+			ent.setY(0);
 			ent.vel.y = 0;
+			ent.accel.y = 0;
+		}
+		
+		// newX = MathUtils.clamp(newX, 0 - ent.getHitBox().getX(), selectedLevel.getWidth() * 90);
+		// newY = MathUtils.clamp(newY, 0, 1080 - ent.getHitBox().height);
+		
+		
+		//if (ent.getHitBox().x + ent.getHitBox().getWidth() > selectedLevel.getWidth() * 90) {
+		//	ent.setX(ent.getX() - )
 	}
 	
 	public void updateCamera() {
@@ -103,31 +129,19 @@ public class GameScreen implements Screen {
 			stage.getCamera().position.y = player.getY();
 		if (player.getY() <= stage.getCamera().viewportHeight / 2)
 			stage.getCamera().position.y = stage.getCamera().viewportHeight / 2;
-		stage.getCamera().position.x = player.getHitBox().x;
 		
+		stage.getCamera().position.x = (2 * player.getHitBox().x - player.getHitBox().width) / 2;
 		stage.getCamera().position.x = MathUtils.clamp(stage.getCamera().position.x, 
-				stage.getCamera().viewportWidth / 2, 
-				9000 - stage.getCamera().position.x);
+													stage.getCamera().viewportWidth / 2, 
+													selectedLevel.getWidth() * 90 - stage.getCamera().viewportWidth / 2);
 		
-		stage.getCamera().position.y = MathUtils.clamp(stage.getCamera().position.y,
-														0, 1080-stage.getCamera().viewportHeight/2);
+		stage.getCamera().position.y = MathUtils.clamp(stage.getCamera().position.y, 0, 1080-stage.getCamera().viewportHeight/2);
 		stage.getCamera().update();
-		// ((OrthographicCamera) stage.getCamera()).translate(5,0);
 	}
 	
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
-		
-
-		for(int i = 0; i < 12; i++){
-			for(int j = 0; j < selectedLevel.getWidth(); j++){
-				if(selectedLevel.getGrid(j,i) == 1){
-					Block immovableBlock = new Block(new Rectangle(90 * j, 1080 - (90 * (i + 1)), 90, 90), Blocked.manager.get("bricks/brick.png", Texture.class), "Immovable Block");
-					stage.addActor(immovableBlock);
-				}
-			}
-		}
 	}
 
 	@Override
@@ -140,7 +154,7 @@ public class GameScreen implements Screen {
 		background = new Image(backgroundRegion);
 		stage.addActor(background);
 
-		player = new Player(new Rectangle(160, 0, 180, 196), new Rectangle(0, 700, 196, 196), Blocked.manager.get("generic.png", Texture.class));
+		player = new Player(new Rectangle(113, 0, 30, 186), new Rectangle(0, 700, 196, 196), Blocked.manager.get("generic.png", Texture.class));
 		
 		entities = new ArrayList<Entity>();
 		entities.add(player);
@@ -168,6 +182,15 @@ public class GameScreen implements Screen {
 				return true;
 			}
 		});
+		
+		for(int i = 0; i < 12; i++){
+			for(int j = 0; j < selectedLevel.getWidth(); j++){
+				if(selectedLevel.getGrid(j,i) == 1){
+					Block immovableBlock = new Block(new Rectangle(90 * j, 1080 - (90 * (i + 1)), 90, 90), Blocked.manager.get("bricks/brick.png", Texture.class), "Immovable Block");
+					stage.addActor(immovableBlock);
+				}
+			}
+		}
 		gameState = GAME_PLAYING;
 	}
 

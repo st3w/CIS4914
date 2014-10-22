@@ -18,13 +18,19 @@ public class Entity extends Actor {
 	
 	public Entity(Rectangle hitBox, Rectangle texBounds, TextureRegion tex, boolean isMovable) {
 		this.tex = tex;
-		this.hitBox = hitBox;
-		this.hitBox.setX(hitBox.getX() + getX());
-		this.hitBox.setY(hitBox.getY() + getY());
+		
 		setWidth(texBounds.width);
 		setHeight(texBounds.height);
-		setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
+		super.setX(texBounds.x + hitBox.width - hitBox.x);
+		super.setY(texBounds.y + hitBox.y);
+		
+		// Fix the hitbox coordinates
+		this.hitBox = hitBox;
+		this.hitBox.setX(texBounds.x);
+		this.hitBox.setY(texBounds.y);
+		
 		this.isMovable = isMovable;
+		
 		vel = new Vector2();
 		accel = new Vector2();
 	}
@@ -74,19 +80,61 @@ public class Entity extends Actor {
 	
 	public boolean isMovable() { return this.isMovable; }
 	
+	public void setIsMovable(boolean value) {
+		isMovable = value;
+	}
+	
 	public Rectangle getHitBox() { 
 		return hitBox;
 	}
 	
 	@Override
 	public void setX(float x) {
-		hitBox.setX(x + hitBox.getX() - getX());
-		super.setX(x);
+		float tempX = getX();
+		hitBox.setX(x);
+		super.setX(x - (tempX - super.getX()));
 	}
 	
 	@Override
 	public void setY(float y) {
-		hitBox.setY(y + hitBox.getY() - getY());
-		super.setY(y);
+		float tempY = getY();
+		hitBox.setY(y);
+		super.setY(y - (tempY - super.getY()));
+	}
+	
+	@Override
+	public float getX() { 
+		return hitBox.getX();
+	}
+	
+	@Override
+	public float getY() {
+		return hitBox.getY();
+	}
+	
+	@Override
+	public float getWidth() {
+		return hitBox.width;
+	}
+	
+	@Override
+	public float getHeight() {
+		return hitBox.height;
+	}
+	
+	public float getTextureWidth() {
+		return super.getWidth();
+	}
+	
+	public float getTextureHeight() {
+		return super.getHeight();
+	}
+	
+	public float getTextureX() {
+		return super.getX();
+	}
+	
+	public float getTextureY() {
+		return super.getY();
 	}
 }
