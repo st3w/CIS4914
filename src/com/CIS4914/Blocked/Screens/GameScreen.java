@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -66,7 +67,15 @@ public class GameScreen implements Screen {
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(1, 1, 0, 1);
 			shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+			for (Entity entity : entities)
+			{
+				if(entity instanceof Player)
+					continue;
+				shapeRenderer.setColor(0, 0, 1, 1);
+				shapeRenderer.rect(entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight());
+			}
 			shapeRenderer.end();
+			
 		}
 	}
 
@@ -80,6 +89,14 @@ public class GameScreen implements Screen {
 				continue;
 			moveEntity(ent, delta);
 			borderCollide(ent);
+		}
+		
+		for (Entity entity : entities) 
+		{
+			if(collides(player, entity) && !(entity instanceof Player) )
+			{
+				stop(player);
+			}
 		}
 	}
 	
@@ -188,10 +205,29 @@ public class GameScreen implements Screen {
 				if(selectedLevel.getGrid(j,i) == 1){
 					Block immovableBlock = new Block(new Rectangle(90 * j, 1080 - (90 * (i + 1)), 90, 90), Blocked.manager.get("bricks/brick.png", Texture.class), "Immovable Block");
 					stage.addActor(immovableBlock);
+					entities.add(immovableBlock);
 				}
 			}
 		}
 		gameState = GAME_PLAYING;
+	}
+	
+	public boolean collides(Player player,  Entity entity)
+	{
+		if(entity.getHitBox().getX() < player.getHitBox().getX() + player.getHitBox().getWidth())
+		{
+			return (Intersector.overlaps(player.getHitBox(), entity.getHitBox() ));
+		}
+		
+		return false;
+	}
+	
+	public void stop(Entity entity)
+	{
+		entity.vel.x=0;
+		entity.vel.y=0;
+		entity.accel.x=0;
+		entity.accel.y=0;
 	}
 
 	@Override

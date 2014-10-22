@@ -51,7 +51,7 @@ public class Entity extends Actor {
 		this.hitBox = texBounds;
 		setWidth(texBounds.width);
 		setHeight(texBounds.height);
-		setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
+		//setBounds(texBounds.x, texBounds.y, texBounds.width, texBounds.height);
 		isMovable = false;
 		vel = new Vector2();
 		accel = new Vector2();
