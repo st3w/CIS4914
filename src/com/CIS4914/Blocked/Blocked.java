@@ -10,6 +10,8 @@ public class Blocked extends Game {
 	public static final String version = "V0.00.08 Pre-Alpha (custom levels populated in game menu and also load blocks into game)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
+	public static final int blockSize = 90;
+	public static final int worldHeight = 1080;
 	
     private MainMenu mainMenuScreen;
 

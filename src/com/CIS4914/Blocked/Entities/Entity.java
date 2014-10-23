@@ -3,6 +3,7 @@ package com.CIS4914.Blocked.Entities;
 import com.CIS4914.Blocked.Blocked;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -76,6 +77,38 @@ public class Entity extends Actor {
 		isMovable = false;
 		vel = new Vector2();
 		accel = new Vector2();
+	}
+	
+	public boolean collides(Entity ent2, Rectangle collisionRectangle) {
+		if (ent2.getX() < getX() + getWidth()) {
+			return (Intersector.intersectRectangles(getHitBox(), ent2.getHitBox(), collisionRectangle));
+		}
+		
+		return false;
+	}
+	
+	public void resolveX(Entity other, Rectangle collisionRectangle) {
+		if (getX() + getWidth() < other.getX() + other.getWidth()) {
+			setX(getX() - collisionRectangle.width - .01f);
+			vel.x = 0;
+			accel.x = 0;
+		} else {
+			setX(other.getX() + other.getWidth() + .01f);
+			vel.x = 0;
+			accel.x = 0;
+		}
+	}
+	
+	public void resolveY(Entity other, Rectangle collisionRectangle) {
+		if (getY() > other.getY()) {
+			setY(getY() + collisionRectangle.height + .01f);
+			vel.y = 0;
+			accel.y = 0;
+		} else {
+			setY(other.getY() - getHeight() - .01f);
+			vel.y = 0;
+			accel.y = 0;
+		}
 	}
 	
 	public boolean isMovable() { return this.isMovable; }
