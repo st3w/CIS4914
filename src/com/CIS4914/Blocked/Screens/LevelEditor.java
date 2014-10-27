@@ -453,7 +453,9 @@ public class LevelEditor implements Screen, GestureListener {
 		int xPos = (int) Math.floor(x * (1920 / screenWidth) + camera.position.x)/90;
 		int yPos = (int) Math.floor(y * (1080 / screenHeight))/90;
 		if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
-			selectedLevel.setGrid(1, xPos, yPos);
+			if(xPos >= 4){
+				selectedLevel.setGrid(1, xPos, yPos);
+			}
 		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
 			// Set to second block
 		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){
