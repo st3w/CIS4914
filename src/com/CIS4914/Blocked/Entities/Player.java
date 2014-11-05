@@ -2,6 +2,7 @@ package com.CIS4914.Blocked.Entities;
 
 import java.util.ArrayList;
 
+import com.CIS4914.Blocked.Blocked;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -99,6 +100,6 @@ public class Player extends Entity {
 			}
 		}
 		if (isJumpButtonDown && vel.y == 0)
-			vel.y = 2200;
+			vel.y = Blocked.jumpSpeed;
 	}
 }

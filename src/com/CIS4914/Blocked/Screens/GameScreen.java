@@ -1,6 +1,7 @@
 package com.CIS4914.Blocked.Screens;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.CIS4914.Blocked.Blocked;
 import com.CIS4914.Blocked.Entities.Block;
@@ -16,7 +17,6 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -70,7 +70,6 @@ public class GameScreen implements Screen {
 				shapeRenderer.rect(entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight());
 			}
 			shapeRenderer.end();
-			
 		}
 	}
 
@@ -100,21 +99,90 @@ public class GameScreen implements Screen {
 		}
 	}
 	
+	// This function should resolve getting stuck between tiles,
+	// but it is still being debugged
+	public void updateWorld2(float delta) {
+		Rectangle[] collisionRectangles = new Rectangle[5];
+		for (int i = 0; i < 5; i++) {
+			collisionRectangles[i] = new Rectangle();
+		}
+		HashMap<Rectangle, Entity> map = new HashMap<Rectangle, Entity>();
+		
+		for (Entity ent1 : entities) {
+			if (!ent1.isMovable()) 
+				continue;
+			moveEntity(ent1,  delta);
+			
+			int i = 0;
+			for (Entity ent2 : entities) {
+				if ((!ent2.isMovable()) && ent1.collides(ent2,  collisionRectangles[i])) {
+					map.put(collisionRectangles[i], ent2);
+					i++;
+				}
+			}
+			
+			for (int j = 0; j < i; j++) {
+				Rectangle maxRect = getMaxRect(collisionRectangles);
+				Entity entity = map.get(maxRect);
+				
+				if (maxRect == null)
+					continue;
+				
+				if (maxRect.width < maxRect.height) {
+					ent1.resolveX(entity, maxRect);
+				} else {
+					if (ent1 instanceof Player)
+						player.isJumpButtonDown = false;
+					ent1.resolveY(entity, maxRect);
+				}
+				
+				for (Rectangle rectangle : collisionRectangles) {
+					if (rectangle == null)
+						continue;
+					if (rectangle.equals(maxRect)) {
+						rectangle = null;
+						continue;
+					}
+					if (!ent1.collides(map.get(rectangle), rectangle)) {
+						rectangle.set(0, 0, 0, 0);
+					}
+				}
+			}
+			
+			map.clear();
+		}
+	}
+	
+	public Rectangle getMaxRect(Rectangle[] rectangles) {
+		Rectangle max = null;
+		
+		for (Rectangle rectangle : rectangles) {
+			if (rectangle == null)
+				continue;
+			if (max == null) {
+				max = rectangle;
+				continue;
+			}
+			
+			if (rectangle.area() > max.area())
+				max = rectangle;
+		}
+		
+		return max;
+	}
+	
 	public void moveEntity(Entity ent, float delta) {
 		// If the math doesn't make sense, see 
 		// http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
-		final float gravity = 4500;
-		final float maxSpeed = 1200;
-		
-		ent.accel.y = -gravity;
+		ent.accel.y = -Blocked.gravity;
 		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
 		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
+		ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
 		ent.setX(ent.getX() + ent.vel.x * delta);
 		ent.setY(ent.getY() + ent.vel.y * delta);
 		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
 		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-		ent.vel.x = MathUtils.clamp(ent.vel.x, -maxSpeed, maxSpeed);
+		ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
 	}
 	
 	public void borderCollide(Entity ent) {
@@ -218,16 +286,6 @@ public class GameScreen implements Screen {
 		});
 		
 		gameState = GAME_PLAYING;
-	}
-	
-	public boolean collides(Player player,  Entity entity)
-	{
-		if(entity.getHitBox().getX() < player.getHitBox().getX() + player.getHitBox().getWidth())
-		{
-			return (Intersector.overlaps(player.getHitBox(), entity.getHitBox() ));
-		}
-		
-		return false;
 	}
 
 	@Override

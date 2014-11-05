@@ -12,6 +12,10 @@ public class Blocked extends Game {
 	public static AssetManager manager;
 	public static final int blockSize = 90;
 	public static final int worldHeight = 1080;
+	public static final float jumpHeight = 3.25f; // height in blocks
+	public static final float gravity = 2f * jumpHeight * Blocked.blockSize / (.44f * .44f);
+	public static final float jumpSpeed = (float) Math.sqrt(2 * gravity * blockSize * jumpHeight);
+	public static final float maxSpeed = 1000;
 	
     private MainMenu mainMenuScreen;
 
@@ -34,5 +38,5 @@ public class Blocked extends Game {
    @Override
    public void render() {
 	   super.render();
-   }
+   }	
 }
