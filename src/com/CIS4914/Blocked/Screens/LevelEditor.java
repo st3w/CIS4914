@@ -58,7 +58,7 @@ public class LevelEditor implements Screen, GestureListener {
 	
 	//Button Variables
 	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
-	TextButton2 mainMenu, pause, save, saveMenu;
+	TextButton2 mainMenu, pause, save, saveMenu, saveCancel;
 	Table levelList;
 	
 	//TextField
@@ -180,11 +180,9 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
 		save = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		saveMenu = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + (buttonWidth + width * 0.02f) * 2f, height - buttonHeight - width * 0.100f, buttonWidth, buttonHeight);
 		
 		stage.addActor(mainMenu);		
 		stage.addActor(save);
-		saveStage.addActor(saveMenu);
 
 		//Scrollable List
 		levelList = new Table(skin);	
@@ -250,14 +248,19 @@ public class LevelEditor implements Screen, GestureListener {
 		saveBackgroundImage.setY(height * 0.5f - saveBackgroundImage.getHeight() * 0.5f);
 		saveStage.addActor(saveBackgroundImage);
 		
-		
 		textStyle = new TextFieldStyle(defaultFont, Color.RED, skin.getDrawable("cursor"), skin.getDrawable("button_down"), null);
-		textBox = new TextField("File Name", textStyle);
+		textBox = new TextField(selectedLevel.getName(), textStyle);
 		textBox.setWidth(width * 0.33f);
 		textBox.setHeight(height * 0.11f);
 		textBox.setX(width * 0.5f - textBox.getWidth() * 0.5f);
-		textBox.setY(height * 0.5f - textBox.getHeight() * 0.5f);
+		textBox.setY(height * 0.5f);
 		saveStage.addActor(textBox);
+		
+		saveMenu = new TextButton2("Save", buttonStyle, width * 0.5f + saveBackgroundImage.getWidth() * 0.5f - buttonWidth * 1.05f, height * 0.5f - saveBackgroundImage.getHeight() * 0.5f + buttonWidth * 0.02f, buttonWidth, buttonHeight);
+		saveCancel = new TextButton2("Cancel", buttonStyle, width * 0.5f - saveBackgroundImage.getWidth() * 0.5f + buttonWidth * 0.05f, height * 0.5f - saveBackgroundImage.getHeight() * 0.5f + buttonWidth * 0.02f, buttonWidth, buttonHeight);
+		
+		saveStage.addActor(saveMenu);
+		saveStage.addActor(saveCancel);
 
 		
 		// Save button Listener
@@ -267,6 +270,16 @@ public class LevelEditor implements Screen, GestureListener {
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				saveGame();
+			}
+		});
+		
+		// Cancel Save button listener
+		saveCancel.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				resumeGame();
 			}
 		});
 		
@@ -453,7 +466,9 @@ public class LevelEditor implements Screen, GestureListener {
 		int xPos = (int) Math.floor(x * (1920 / screenWidth) + camera.position.x)/90;
 		int yPos = (int) Math.floor(y * (1080 / screenHeight))/90;
 		if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
-			selectedLevel.setGrid(1, xPos, yPos);
+			if(xPos >= 4){
+				selectedLevel.setGrid(1, xPos, yPos);
+			}
 		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
 			// Set to second block
 		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){

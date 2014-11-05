@@ -22,7 +22,11 @@ public class Level {
 		
 		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < width; j++){
-				grid[j][i] = 0;
+				if(i <= 12 && i >= 10 && j <= 3){
+					grid[j][i] = 1;
+				} else{
+					grid[j][i] = 0;
+				}
 			}
 		}
 		
