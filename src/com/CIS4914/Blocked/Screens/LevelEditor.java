@@ -23,6 +23,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -42,8 +43,7 @@ public class LevelEditor implements Screen, GestureListener {
 	//Base Variables
 	Blocked game;
 	SpriteBatch batch;
-	Stage stage;
-	Stage saveStage;
+	Stage stage, fadeStage, saveStage;
 	Level selectedLevel;
 	InputMultiplexer input = new InputMultiplexer();
 	
@@ -52,7 +52,7 @@ public class LevelEditor implements Screen, GestureListener {
 	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
 	Texture tableBackground, gameBackground, gridBackground, immovableBlock,saveBackground;
-	Image backgroundImage, tableBackgroundImage, saveBackgroundImage;
+	Image tableBackgroundImage, saveBackgroundImage;
 	Vector<Sprite> background = new Vector<Sprite>();
 	int backgroundTiles, gridTiles, blockTiles;
 	
@@ -93,6 +93,7 @@ public class LevelEditor implements Screen, GestureListener {
 		
 	    batch.setProjectionMatrix(camera.combined);
 		stage.act(Gdx.graphics.getDeltaTime());
+		fadeStage.act(Gdx.graphics.getDeltaTime());
 		
 		batch.begin();
 		for(int i = 0; i < backgroundTiles + gridTiles + blockTiles; i++){
@@ -102,13 +103,16 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		// For Save menu
 		if(gameState == GAME_SAVE){
+			saveStage.act(Gdx.graphics.getDeltaTime());
 			batch.begin();
 			stage.draw();
+			fadeStage.draw();
 			saveStage.draw();
 			batch.end();
 		} else{
 			batch.begin();
 			stage.draw();
+			fadeStage.draw();
 			batch.end();
 		}
 	}
@@ -150,10 +154,17 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		stage = new Stage();
 		stage.clear();
+		fadeStage = new Stage();
+		fadeStage.clear();
 		saveStage = new Stage();
 		saveStage.clear();
 		
-
+		Texture blackTexture = Blocked.manager.get("black.jpg");
+		Image blackBackground = new Image(blackTexture);
+		blackBackground.setWidth(width);
+		blackBackground.setHeight(height);
+		fadeStage.addActor(blackBackground);
+		fadeStage.addAction(Actions.alpha(0, .5f));
 		
 		input.addProcessor(stage);
 		input.addProcessor(new GestureDetector(this));
@@ -261,6 +272,8 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		saveStage.addActor(saveMenu);
 		saveStage.addActor(saveCancel);
+		
+		saveStage.addAction(Actions.sequence(Actions.fadeIn(1)));
 
 		
 		// Save button Listener
@@ -269,7 +282,14 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				saveGame();
+				
+				fadeStage.addAction(Actions.sequence(Actions.alpha(.7f, .3f), Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						saveGame();
+					}
+				})));
+				
 			}
 		});
 		
@@ -279,7 +299,12 @@ public class LevelEditor implements Screen, GestureListener {
 				return true;
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				resumeGame();
+				fadeStage.addAction(Actions.sequence(Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						resumeGame();
+					}
+				}), Actions.alpha(0, .3f)));
 			}
 		});
 		
@@ -290,56 +315,63 @@ public class LevelEditor implements Screen, GestureListener {
 			}
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 				
-				textBox.next(true);
-				
-				selectedLevel.setName(textBox.getText());
-				String currentSave = json.toJson(selectedLevel);
-				saveFile = Gdx.files.local("customLevels");
-				
-				if(saveFile.exists()){
-					String customLevelString = saveFile.readString();
-					String[] customLevelArray = customLevelString.split("\n");
-					Level[] levelArray = new Level[customLevelArray.length];
+				fadeStage.addAction(Actions.sequence(Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						textBox.next(true);
+						
+						selectedLevel.setName(textBox.getText());
+						String currentSave = json.toJson(selectedLevel);
+						saveFile = Gdx.files.local("customLevels");
+						
+						if(saveFile.exists()){
+							String customLevelString = saveFile.readString();
+							String[] customLevelArray = customLevelString.split("\n");
+							Level[] levelArray = new Level[customLevelArray.length];
 
-					for(int i = 0; i < customLevelArray.length; i++){			
-						levelArray[i] = json.fromJson(Level.class, (String) customLevelArray[i]);
-					}
-					
-					Boolean nameConflict = false;
+							for(int i = 0; i < customLevelArray.length; i++){			
+								levelArray[i] = json.fromJson(Level.class, (String) customLevelArray[i]);
+							}
+							
+							Boolean nameConflict = false;
 
-					
-					for(int i = 0; i < levelArray.length; i++){			
-						if(selectedLevel.getName().equals(levelArray[i].getName())){
-							nameConflict = true;
-						}
-					}
-
-
-
-					if(nameConflict){
-						for(int i = 0; i < levelArray.length; i++){
-							String levelSave = json.toJson(levelArray[i]);
-							if(i == 0){ // in the first iteration need to overwrite
+							
+							for(int i = 0; i < levelArray.length; i++){			
 								if(selectedLevel.getName().equals(levelArray[i].getName())){
-									saveFile.writeString(currentSave + "\n", false);
-								} else{
-									saveFile.writeString(levelSave + "\n", false);
-								}
-							} else{
-								if(selectedLevel.getName().equals(levelArray[i].getName())){
-									saveFile.writeString(currentSave + "\n", true);
-								} else{
-									saveFile.writeString(levelSave + "\n", true);
+									nameConflict = true;
 								}
 							}
+
+
+
+							if(nameConflict){
+								for(int i = 0; i < levelArray.length; i++){
+									String levelSave = json.toJson(levelArray[i]);
+									if(i == 0){ // in the first iteration need to overwrite
+										if(selectedLevel.getName().equals(levelArray[i].getName())){
+											saveFile.writeString(currentSave + "\n", false);
+										} else{
+											saveFile.writeString(levelSave + "\n", false);
+										}
+									} else{
+										if(selectedLevel.getName().equals(levelArray[i].getName())){
+											saveFile.writeString(currentSave + "\n", true);
+										} else{
+											saveFile.writeString(levelSave + "\n", true);
+										}
+									}
+								}
+							} else{
+								saveFile.writeString(currentSave + "\n", true);
+							}
+						} else{
+							saveFile.writeString(currentSave + "\n", true);
 						}
-					} else{
-						saveFile.writeString(currentSave + "\n", true);
+						resumeGame();
 					}
-				} else{
-					saveFile.writeString(currentSave + "\n", true);
-				}
-				resumeGame();
+				}), Actions.alpha(0, .3f)));
+				
+				
 			}
 		});
 		
@@ -386,6 +418,7 @@ public class LevelEditor implements Screen, GestureListener {
 		defaultFont.dispose();
 		textures.dispose();
 		stage.dispose();
+		saveStage.dispose();
 	}
 	
 	public void saveGame() {
