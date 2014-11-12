@@ -58,7 +58,7 @@ public class LevelEditor implements Screen, GestureListener {
 	
 	//Button Variables
 	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
-	TextButton2 mainMenu, pause, save, saveMenu, saveCancel;
+	TextButton2 mainMenu, save, saveMenu, saveCancel;
 	Table levelList;
 	
 	//TextField
@@ -152,13 +152,6 @@ public class LevelEditor implements Screen, GestureListener {
 		blocks.add("L");
 		//TEMPORARY
 		
-		stage = new Stage();
-		stage.clear();
-		fadeStage = new Stage();
-		fadeStage.clear();
-		saveStage = new Stage();
-		saveStage.clear();
-		
 		Texture blackTexture = Blocked.manager.get("black.jpg");
 		Image blackBackground = new Image(blackTexture);
 		blackBackground.setWidth(width);
@@ -190,7 +183,7 @@ public class LevelEditor implements Screen, GestureListener {
 		float buttonHeight = width * 0.06f;
 		
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		save = new TextButton2("Save", buttonStyle, screenWidth * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		save = new TextButton2("Save", buttonStyle, width * 0.015f + buttonWidth + width * 0.02f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
 		
 		stage.addActor(mainMenu);		
 		stage.addActor(save);
@@ -379,6 +372,10 @@ public class LevelEditor implements Screen, GestureListener {
 
 	@Override
 	public void show() {
+		stage = new Stage();
+		fadeStage = new Stage();
+		saveStage = new Stage();
+
 		
 		batch = new SpriteBatch();
 		textures = new TextureAtlas("textures.atlas");
@@ -495,21 +492,21 @@ public class LevelEditor implements Screen, GestureListener {
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
 		Array<Cell> list = levelList.getCells();
-		
+
 		int xPos = (int) Math.floor(x * (1920 / screenWidth) + camera.position.x)/90;
 		int yPos = (int) Math.floor(y * (1080 / screenHeight))/90;
-		if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
-			if(xPos >= 4){
+		if(xPos >= 4){
+			if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
 				selectedLevel.setGrid(1, xPos, yPos);
+			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
+				// Set to second block
+			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){
+				// Set to third block
+			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(3).getActor()).isChecked()){
+				// Set to fourth block
+			}else if(selectedLevel.getGrid(xPos, yPos) == 1){
+				selectedLevel.setGrid(0, xPos, yPos);
 			}
-		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
-			// Set to second block
-		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){
-			// Set to third block
-		}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(3).getActor()).isChecked()){
-			// Set to fourth block
-		}else if(selectedLevel.getGrid(xPos, yPos) == 1){
-			selectedLevel.setGrid(0, xPos, yPos);
 		}
 		updateMap();
 		return false;
