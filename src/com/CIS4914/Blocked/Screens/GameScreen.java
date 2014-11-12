@@ -54,7 +54,7 @@ public class GameScreen implements Screen {
 		switch (gameState) {
 		case GAME_PLAYING:
 			stage.act(delta);
-			updateWorld(delta);
+			updateWorld2(delta);
 			updateCamera();
 			stage.draw();
 			
@@ -84,6 +84,9 @@ public class GameScreen implements Screen {
 			moveEntity(ent1, delta);
 			
 			for (Entity ent2 : entities) {
+				if (ent1.equals(ent2))
+					continue;
+				
 				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
 					if (collisionRectangle.width < collisionRectangle.height) {
 						ent1.resolveX(ent2, collisionRectangle);
@@ -99,8 +102,7 @@ public class GameScreen implements Screen {
 		}
 	}
 	
-	// This function should resolve getting stuck between tiles,
-	// but it is still being debugged
+	// Need to resolve jitter jatter 
 	public void updateWorld2(float delta) {
 		Rectangle[] collisionRectangles = new Rectangle[5];
 		for (int i = 0; i < 5; i++) {
@@ -115,7 +117,10 @@ public class GameScreen implements Screen {
 			
 			int i = 0;
 			for (Entity ent2 : entities) {
-				if ((!ent2.isMovable()) && ent1.collides(ent2,  collisionRectangles[i])) {
+				if (ent1.equals(ent2))
+					continue;
+				
+				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangles[i])) {
 					map.put(collisionRectangles[i], ent2);
 					i++;
 				}
@@ -139,12 +144,21 @@ public class GameScreen implements Screen {
 				for (Rectangle rectangle : collisionRectangles) {
 					if (rectangle == null)
 						continue;
+					if (rectangle.width == 0 && rectangle.height == 0)
+						continue;
 					if (rectangle.equals(maxRect)) {
 						rectangle = null;
 						continue;
 					}
-					if (!ent1.collides(map.get(rectangle), rectangle)) {
+					if (map.get(rectangle) == null) 
+						continue;
+					
+					// Error lies here
+					Entity tempEntity = map.get(rectangle);
+					if (!ent1.collides(tempEntity, rectangle)) {
 						rectangle.set(0, 0, 0, 0);
+					} else {
+						map.put(rectangle, tempEntity);
 					}
 				}
 			}
