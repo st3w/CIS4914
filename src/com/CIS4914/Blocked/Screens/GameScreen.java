@@ -76,7 +76,6 @@ public class GameScreen implements Screen {
 			updateWorld2(delta);
 
 			fadeStage.act(Gdx.graphics.getDeltaTime());
-			updateWorld(delta);
 			updateCamera();
 			
 			batch.begin();
