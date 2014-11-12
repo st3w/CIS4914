@@ -4,25 +4,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.CIS4914.Blocked.Blocked;
+import com.CIS4914.Blocked.Controllers.TextButton2;
 import com.CIS4914.Blocked.Entities.Block;
 import com.CIS4914.Blocked.Entities.Entity;
 import com.CIS4914.Blocked.Entities.Level;
 import com.CIS4914.Blocked.Entities.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
@@ -31,11 +40,21 @@ public class GameScreen implements Screen {
 	private static final int GAME_OVER = 2;
 	
 	private int gameState;
-	private Stage stage;
+	private Stage stage, UIStage, fadeStage;
 	private Blocked game;
 	private Image background;
 	private ArrayList<Entity> entities;
 	private Player player;
+	
+	private TextButtonStyle buttonStyle;
+	private TextButton2 mainMenu, pause;
+	
+	private BitmapFont defaultFont;
+	Skin skin;
+	TextureAtlas textures;
+	
+	InputMultiplexer input = new InputMultiplexer();
+	SpriteBatch batch;
 	
 	private Level selectedLevel;
 	
@@ -50,14 +69,24 @@ public class GameScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
 		switch (gameState) {
 		case GAME_PLAYING:
 			stage.act(delta);
 			updateWorld2(delta);
+
+			fadeStage.act(Gdx.graphics.getDeltaTime());
+			updateWorld(delta);
 			updateCamera();
-			stage.draw();
 			
+			batch.begin();
+			stage.draw();
+			UIStage.draw();
+			fadeStage.draw();
+			batch.end();
+
+			// Developer Collision Edges
+			/*
 			shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(1, 0, 1, 1);
@@ -70,6 +99,7 @@ public class GameScreen implements Screen {
 				shapeRenderer.rect(entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight());
 			}
 			shapeRenderer.end();
+			*/
 		}
 	}
 
@@ -245,17 +275,54 @@ public class GameScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
+		
+		Texture blackTexture = Blocked.manager.get("black.jpg");
+		Image blackBackground = new Image(blackTexture);
+		blackBackground.setWidth(width);
+		blackBackground.setHeight(height);
+		fadeStage.addActor(blackBackground);
+		fadeStage.addAction(Actions.alpha(0, .5f));
+		
+		float buttonWidth = width * 0.18f;
+		float buttonHeight = width * 0.06f;
+		
+		defaultFont.setScale(width * 0.00035f);
+		
+		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		UIStage.addActor(mainMenu);		
+		
+		mainMenu.addListener(new InputListener(){
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				((Blocked) Gdx.app.getApplicationListener()).setScreen(new MainMenu(game)); 
+
+			}
+		});
 	}
 
 	@Override
 	public void show() {
 		stage = new Stage(new ExtendViewport(1080, 880, 2560, 880));
+		UIStage = new Stage();
+		fadeStage = new Stage();
+		
+		batch = new SpriteBatch();
+		skin = new Skin();
+		
+		textures = new TextureAtlas("textures.atlas");
+		skin = new Skin();
+		skin.addRegions(textures);
 		
 		Texture backgroundTex = Blocked.manager.get("game_background.jpg", Texture.class);
 		backgroundTex.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
 		TextureRegion backgroundRegion = new TextureRegion(backgroundTex, 0, 0, selectedLevel.getWidth() * Blocked.blockSize, Blocked.worldHeight);
 		background = new Image(backgroundRegion);
 		stage.addActor(background);
+		
+		defaultFont = new BitmapFont(Gdx.files.internal("arial_black_72pt.fnt"), false);
+		buttonStyle = new TextButtonStyle(skin.getDrawable("button_up"), skin.getDrawable("button_down"), null, defaultFont);
 
 		player = new Player(new Rectangle(113, 0, 30, 179), new Rectangle(0, 300, 196, 196), Blocked.manager.get("generic.png", Texture.class));
 		
@@ -273,7 +340,10 @@ public class GameScreen implements Screen {
 			}
 		}
 		
-		Gdx.input.setInputProcessor(stage);
+		input.addProcessor(stage);
+		input.addProcessor(UIStage);
+		Gdx.input.setInputProcessor(input);
+		
 		stage.setKeyboardFocus(player);
 		
 		player.addListener(new InputListener() {

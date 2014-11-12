@@ -7,7 +7,7 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "V0.00.08 Pre-Alpha (custom levels populated in game menu and also load blocks into game)";
+	public static final String version = "V0.00.09 Pre-Alpha (Game Screen Transitions and Start of Game Screen UI)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
 	public static final int blockSize = 90;
@@ -29,6 +29,8 @@ public class Blocked extends Game {
 		manager.load("menu_background.png", Texture.class);
 		manager.load("table_background.png", Texture.class);
 		manager.load("generic.png", Texture.class);
+		manager.load("black.jpg", Texture.class);
+		
 		manager.finishLoading();
 		
         mainMenuScreen = new MainMenu(this);
