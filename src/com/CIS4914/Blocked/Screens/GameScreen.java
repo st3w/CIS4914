@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
 	private Player player;
 	
 	private TextButtonStyle buttonStyle;
-	private TextButton2 mainMenu, pause;
+	private TextButton2 mainMenu, moveLeft, moveRight, moveJump;
 	
 	private BitmapFont defaultFont;
 	Skin skin;
@@ -288,7 +288,14 @@ public class GameScreen implements Screen {
 		defaultFont.setScale(width * 0.00035f);
 		
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		UIStage.addActor(mainMenu);		
+		moveLeft = new TextButton2("Left", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
+		moveRight = new TextButton2("Right", buttonStyle, width - buttonWidth - width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
+		moveJump = new TextButton2("Jump", buttonStyle, width - buttonWidth - width * 0.015f, width * 0.03f + buttonHeight, buttonWidth, buttonHeight);
+		
+		UIStage.addActor(mainMenu);
+		UIStage.addActor(moveLeft);
+		UIStage.addActor(moveRight);
+		UIStage.addActor(moveJump);
 		
 		mainMenu.addListener(new InputListener(){
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
