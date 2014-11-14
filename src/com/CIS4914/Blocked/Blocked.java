@@ -1,6 +1,7 @@
 package com.CIS4914.Blocked;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.CIS4914.Blocked.Screens.MainMenu;
@@ -21,20 +22,20 @@ public class Blocked extends Game {
 
    @Override
     public void create() {
-	   	manager = new AssetManager();
-	   	manager.load("bricks/brick.png", Texture.class);
-	   	manager.load("game_background.jpg", Texture.class);
-	   	manager.load("grid.png", Texture.class);
-	   	manager.load("main_menu_background.png", Texture.class);
-		manager.load("menu_background.png", Texture.class);
-		manager.load("table_background.png", Texture.class);
-		manager.load("generic.png", Texture.class);
-		manager.load("black.jpg", Texture.class);
-		
-		manager.finishLoading();
-		
-        mainMenuScreen = new MainMenu(this);
-        setScreen(mainMenuScreen);   
+	   manager = new AssetManager();
+	   manager.load("bricks/brick.png", Texture.class);
+	   manager.load("game_background.jpg", Texture.class);
+	   manager.load("grid.png", Texture.class);
+	   manager.load("main_menu_background.png", Texture.class);
+	   manager.load("menu_background.png", Texture.class);
+	   manager.load("table_background.png", Texture.class);
+	   manager.load("generic.png", Texture.class);
+	   manager.load("black.jpg", Texture.class);
+
+	   manager.finishLoading();
+
+	   mainMenuScreen = new MainMenu(this);
+	   setScreen(mainMenuScreen);   
    }
    
    @Override
