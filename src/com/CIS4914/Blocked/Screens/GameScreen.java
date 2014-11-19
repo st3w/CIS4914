@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.CIS4914.Blocked.Blocked;
+import com.CIS4914.Blocked.Controllers.Button2;
 import com.CIS4914.Blocked.Controllers.TextButton2;
 import com.CIS4914.Blocked.Entities.Block;
 import com.CIS4914.Blocked.Entities.Entity;
 import com.CIS4914.Blocked.Entities.Level;
 import com.CIS4914.Blocked.Entities.Player;
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -23,14 +22,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -48,8 +50,9 @@ public class GameScreen implements Screen {
 	private Player player;
 	
 	private TextButtonStyle buttonStyle;
-	private TextButton2 mainMenu, moveLeft, moveRight, moveJump;
-	private ImageButton leftButton, rightButton;
+	private TextButton2 mainMenu;
+	Button moveLeft, moveRight, moveJump;
+	
 	private BitmapFont defaultFont;
 	Skin skin;
 	TextureAtlas textures;
@@ -288,13 +291,10 @@ public class GameScreen implements Screen {
 		
 		defaultFont.setScale(width * 0.00035f);
 		
-		if (mainMenu != null && mainMenu.hasParent())
-			mainMenu.remove();
-		
 		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		moveLeft = new TextButton2("Left", buttonStyle, width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
-		moveRight = new TextButton2("Right", buttonStyle, width - buttonWidth - width * 0.015f, width * 0.015f, buttonWidth, buttonHeight);
-		moveJump = new TextButton2("Jump", buttonStyle, width - buttonWidth - width * 0.015f, width * 0.03f + buttonHeight, buttonWidth, buttonHeight);
+		moveLeft = new Button2(skin.getDrawable("left_arrow"), skin.getDrawable("left_arrow_down"), width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveRight = new Button2(skin.getDrawable("right_arrow"), skin.getDrawable("right_arrow_down"), width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveJump = new Button2(skin.getDrawable("jump_button"), skin.getDrawable("jump_button_down"), width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
 		
 		UIStage.addActor(mainMenu);
 		UIStage.addActor(moveLeft);
@@ -327,7 +327,7 @@ public class GameScreen implements Screen {
 		
 		Texture backgroundTex = Blocked.manager.get("game_background.jpg", Texture.class);
 		backgroundTex.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-		TextureRegion backgroundRegion = new TextureRegion(backgroundTex, 0, 0, selectedLevel.getWidth() * Blocked.blockSize / 1920, 1);
+		TextureRegion backgroundRegion = new TextureRegion(backgroundTex, 0, 0, selectedLevel.getWidth() * Blocked.blockSize, Blocked.worldHeight);
 		background = new Image(backgroundRegion);
 		stage.addActor(background);
 		
@@ -339,10 +339,6 @@ public class GameScreen implements Screen {
 		entities = new ArrayList<Entity>();
 		entities.add(player);
 		stage.addActor(player);
-		
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			
-		}
 		
 		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < selectedLevel.getWidth(); j++){
