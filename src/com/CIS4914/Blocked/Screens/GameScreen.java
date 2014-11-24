@@ -74,7 +74,7 @@ public class GameScreen implements Screen {
 		switch (gameState) {
 		case GAME_PLAYING:
 			stage.act(delta);
-			updateWorld2(delta);
+			updateWorld(delta);
 
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
@@ -102,131 +102,61 @@ public class GameScreen implements Screen {
 			*/
 		}
 	}
-
-	// Update each dynamic entity's position
-	public void updateWorld(float delta)
-	{
+	
+	public void updateWorld(float delta) {
 		Rectangle collisionRectangle = new Rectangle();
 		
 		for (Entity ent1 : entities) {
 			if (!ent1.isMovable()) 
 				continue;
-			moveEntity(ent1, delta);
+			
+			// Move entity in the y-axis first to avoid sticking when moving
+			// across adjacent tiles
+			moveEntity(ent1, delta, false, true);
 			
 			for (Entity ent2 : entities) {
 				if (ent1.equals(ent2))
 					continue;
 				
+				// If ent1 collides with a static object
 				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
-					if (collisionRectangle.width < collisionRectangle.height) {
-						ent1.resolveX(ent2, collisionRectangle);
-					} else {
-						if (ent1 instanceof Player)
-							player.isJumpButtonDown = false;
-						ent1.resolveY(ent2, collisionRectangle);
-					}
-				}
-			}
-			
-			borderCollide(ent1);
-		}
-	}
-	
-	// Need to resolve jitter jatter 
-	public void updateWorld2(float delta) {
-		Rectangle[] collisionRectangles = new Rectangle[5];
-		for (int i = 0; i < 5; i++) {
-			collisionRectangles[i] = new Rectangle();
-		}
-		HashMap<Rectangle, Entity> map = new HashMap<Rectangle, Entity>();
-		
-		for (Entity ent1 : entities) {
-			if (!ent1.isMovable()) 
-				continue;
-			moveEntity(ent1,  delta);
-			
-			int i = 0;
-			for (Entity ent2 : entities) {
-				if (ent1.equals(ent2))
-					continue;
-				
-				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangles[i])) {
-					map.put(collisionRectangles[i], ent2);
-					i++;
-				}
-			}
-			
-			for (int j = 0; j < i; j++) {
-				Rectangle maxRect = getMaxRect(collisionRectangles);
-				Entity entity = map.get(maxRect);
-				
-				if (maxRect == null)
-					continue;
-				
-				if (maxRect.width < maxRect.height) {
-					ent1.resolveX(entity, maxRect);
-				} else {
 					if (ent1 instanceof Player)
 						player.isJumpButtonDown = false;
-					ent1.resolveY(entity, maxRect);
+					ent1.resolveY(ent2, collisionRectangle);
 				}
+			}
+			
+			// Move entity in the x-axis and resolve collisions
+			moveEntity(ent1, delta, true, false);
+			
+			for (Entity ent2 : entities) {
+				if (ent1.equals(ent2))
+					continue;
 				
-				for (Rectangle rectangle : collisionRectangles) {
-					if (rectangle == null)
-						continue;
-					if (rectangle.width == 0 && rectangle.height == 0)
-						continue;
-					if (rectangle.equals(maxRect)) {
-						rectangle = null;
-						continue;
-					}
-					if (map.get(rectangle) == null) 
-						continue;
-					
-					// Error lies here
-					Entity tempEntity = map.get(rectangle);
-					if (!ent1.collides(tempEntity, rectangle)) {
-						rectangle.set(0, 0, 0, 0);
-					} else {
-						map.put(rectangle, tempEntity);
-					}
+				// If ent1 collides with a static object
+				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
+					ent1.resolveX(ent2, collisionRectangle);
 				}
 			}
-			
-			map.clear();
 		}
 	}
 	
-	public Rectangle getMaxRect(Rectangle[] rectangles) {
-		Rectangle max = null;
-		
-		for (Rectangle rectangle : rectangles) {
-			if (rectangle == null)
-				continue;
-			if (max == null) {
-				max = rectangle;
-				continue;
-			}
-			
-			if (rectangle.area() > max.area())
-				max = rectangle;
+	// If the math doesn't make sense, see 
+	// http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
+	public void moveEntity(Entity ent, float delta, boolean moveX, boolean moveY) {
+		if (moveY) {
+			ent.accel.y = -Blocked.gravity;
+			ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
+			ent.setY(ent.getY() + ent.vel.y * delta);
+			ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
 		}
-		
-		return max;
-	}
-	
-	public void moveEntity(Entity ent, float delta) {
-		// If the math doesn't make sense, see 
-		// http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
-		ent.accel.y = -Blocked.gravity;
-		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
-		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-		ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
-		ent.setX(ent.getX() + ent.vel.x * delta);
-		ent.setY(ent.getY() + ent.vel.y * delta);
-		ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
-		ent.vel.y = ent.vel.y + ent.accel.y * delta / 2f;
-		ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
+		if (moveX) {
+			ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
+			ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
+			ent.setX(ent.getX() + ent.vel.x * delta);
+			ent.vel.x = ent.vel.x + ent.accel.x * delta / 2f;
+			ent.vel.x = MathUtils.clamp(ent.vel.x, -Blocked.maxSpeed, Blocked.maxSpeed);
+		}
 	}
 	
 	public void borderCollide(Entity ent) {
@@ -300,16 +230,6 @@ public class GameScreen implements Screen {
 		UIStage.addActor(moveLeft);
 		UIStage.addActor(moveRight);
 		UIStage.addActor(moveJump);
-		
-		mainMenu.addListener(new InputListener(){
-			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				return true;
-			}
-			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				((Blocked) Gdx.app.getApplicationListener()).setScreen(new MainMenu(game)); 
-
-			}
-		});
 	}
 
 	@Override
@@ -339,10 +259,6 @@ public class GameScreen implements Screen {
 		entities = new ArrayList<Entity>();
 		entities.add(player);
 		stage.addActor(player);
-		
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			
-		}
 		
 		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < selectedLevel.getWidth(); j++){
