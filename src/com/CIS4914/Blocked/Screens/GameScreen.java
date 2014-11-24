@@ -1,7 +1,6 @@
 package com.CIS4914.Blocked.Screens;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.CIS4914.Blocked.Blocked;
 import com.CIS4914.Blocked.Controllers.Button2;
@@ -49,6 +48,7 @@ public class GameScreen implements Screen {
 	private ArrayList<Entity> entities;
 	private Player player;
 	
+	Image blackBackground;
 	private TextButtonStyle buttonStyle;
 	private TextButton2 mainMenu;
 	Button moveLeft, moveRight, moveJump;
@@ -141,6 +141,8 @@ public class GameScreen implements Screen {
 					ent1.resolveX(ent2, collisionRectangle);
 				}
 			}
+			
+			borderCollide(ent1);
 		}
 	}
 	
@@ -176,18 +178,6 @@ public class GameScreen implements Screen {
 			ent.vel.x = 0;
 			ent.accel.x = 0;
 		}
-				
-		// Off the bottom
-		if (ent.getY() < 0) {
-			ent.setY(0);
-			ent.vel.y = 0;
-			ent.accel.y = 0;
-		}
-		
-		// Top
-		if (ent.getY() + ent.getHeight() > Blocked.worldHeight) {
-			ent.setY(Blocked.worldHeight - ent.getHeight());
-		}
 	}
 	
 	public void updateCamera() {
@@ -209,27 +199,18 @@ public class GameScreen implements Screen {
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height, true);
 		
-		Texture blackTexture = Blocked.manager.get("black.jpg");
-		Image blackBackground = new Image(blackTexture);
 		blackBackground.setWidth(width);
 		blackBackground.setHeight(height);
-		fadeStage.addActor(blackBackground);
-		fadeStage.addAction(Actions.alpha(0, .5f));
 		
 		float buttonWidth = width * 0.18f;
 		float buttonHeight = width * 0.06f;
 		
 		defaultFont.setScale(width * 0.00035f);
 		
-		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
-		moveLeft = new Button2(skin.getDrawable("left_arrow"), skin.getDrawable("left_arrow_down"), width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
-		moveRight = new Button2(skin.getDrawable("right_arrow"), skin.getDrawable("right_arrow_down"), width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
-		moveJump = new Button2(skin.getDrawable("jump_button"), skin.getDrawable("jump_button_down"), width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
-		
-		UIStage.addActor(mainMenu);
-		UIStage.addActor(moveLeft);
-		UIStage.addActor(moveRight);
-		UIStage.addActor(moveJump);
+		mainMenu.setBounds(width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		moveLeft.setBounds(width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveRight.setBounds(width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveJump.setBounds(width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
 	}
 
 	@Override
@@ -259,6 +240,70 @@ public class GameScreen implements Screen {
 		entities = new ArrayList<Entity>();
 		entities.add(player);
 		stage.addActor(player);
+		
+		float width = Gdx.graphics.getWidth();
+		float height = Gdx.graphics.getHeight();
+		blackBackground = new Image((Texture) (Blocked.manager.get("black.jpg")));
+		blackBackground.setWidth(width);
+		blackBackground.setHeight(height);
+		fadeStage.addActor(blackBackground);
+		fadeStage.addAction(Actions.alpha(0, .5f));
+		
+		float buttonWidth = width * 0.18f;
+		float buttonHeight = width * 0.06f; // wtf?
+		
+		mainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.015f, height - buttonHeight - width * 0.015f, buttonWidth, buttonHeight);
+		moveLeft = new Button2(skin.getDrawable("left_arrow"), skin.getDrawable("left_arrow_down"), width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveRight = new Button2(skin.getDrawable("right_arrow"), skin.getDrawable("right_arrow_down"), width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
+		moveJump = new Button2(skin.getDrawable("jump_button"), skin.getDrawable("jump_button_down"), width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
+		
+		UIStage.addActor(mainMenu);
+		UIStage.addActor(moveLeft);
+		UIStage.addActor(moveRight);
+		UIStage.addActor(moveJump);
+		
+		mainMenu.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				game.setScreen(new MainMenu(game));
+			}
+		});
+		
+		moveLeft.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				player.isLeftButtonDown = true;
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				player.isLeftButtonDown = false;
+			}
+		});
+		
+		moveRight.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				player.isRightButtonDown = true;
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				player.isRightButtonDown = false;
+			}
+		});
+		
+		moveJump.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				player.isJumpButtonDown = true;
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				player.isJumpButtonDown = false;
+			}
+		});
 		
 		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < selectedLevel.getWidth(); j++){
