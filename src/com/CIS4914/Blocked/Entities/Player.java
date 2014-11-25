@@ -12,31 +12,30 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player extends Entity {
-	// Player states
-	static final int STAND_RIGHT = 0;
-	static final int STAND_LEFT = 1;
-	static final int RUN_RIGHT = 2;
-	static final int RUN_LEFT = 3;
-	static final int JUMP_RIGHT = 4;
-	static final int JUMP_LEFT = 5;
-	
 	static final int SHEET_COLS = 8;
 	static final int SHEET_ROWS = 9;
 	
-	TextureRegion standFrame;
-	TextureRegion[] runFrames; // 8
-	TextureRegion[] jumpFrames; // 8
-	Animation runAnimation;
-	Animation jumpAnimation;
+	TextureRegion standLeftFrame;
+	TextureRegion standRightFrame;
+	TextureRegion[] runLeftFrames; 
+	TextureRegion[] runRightFrames;
+	TextureRegion[] jumpLeftFrames;
+	TextureRegion[] jumpRightFrames;
+	TextureRegion[] walkLeftFrames;
+	TextureRegion[] walkRightFrames;
+	
+	Animation runLeftAnimation;
+	Animation runRightAnimation;
+	Animation walkLeftAnimation;
+	Animation walkRightAnimation;
 	
 	float stateTime;
-	int state;
 	
 	public boolean isLeftButtonDown;
 	public boolean isRightButtonDown;
 	public boolean isJumpButtonDown;
-	
-	ShapeRenderer shapeRenderer;
+	public boolean isFacingRight;
+	public boolean isOnGround;
 	
 	public Player(Rectangle hitBox, Rectangle objBound, Texture playerTex) {
 		super(hitBox, objBound, new TextureRegion(playerTex), true);
@@ -44,36 +43,110 @@ public class Player extends Entity {
 													playerTex.getWidth() / SHEET_COLS,
 													playerTex.getHeight() / SHEET_ROWS);
 		
-		runFrames = new TextureRegion[8];
+		standRightFrame = new TextureRegion(frames[8][0]);
+		standLeftFrame = new TextureRegion(frames[8][0]);
+		standLeftFrame.flip(true, false);
+		
+		runRightFrames = new TextureRegion[8];
 		for (int i = 0; i < 4; i++)
-			runFrames[i] = frames[0][i+4];
+			runRightFrames[i] = frames[0][i+4];
 
 		for (int i = 0; i < 4; i++)
-			runFrames[i+4] = frames[1][i];
+			runRightFrames[i+4] = frames[1][i];
 		
-		jumpFrames = new TextureRegion[8];
+		runLeftFrames = new TextureRegion[8];
+		for (int i = 0; i < 8; i++) {
+			runLeftFrames[i] = new TextureRegion(runRightFrames[i]);
+			runLeftFrames[i].flip(true, false);
+		}
+		
+		jumpRightFrames = new TextureRegion[8];
 		for (int i = 0; i < 8; i++)
-			jumpFrames[i] = frames[5][i];
+			jumpRightFrames[i] = frames[5][i];
 		
-		standFrame = new TextureRegion(frames[8][0]);
-		runAnimation = new Animation(1/15f, runFrames);
-		jumpAnimation = new Animation(1/15f, jumpFrames);
-		state = STAND_RIGHT;
+		jumpLeftFrames = new TextureRegion[8];
+		for (int i = 0; i < 8; i++) {
+			jumpLeftFrames[i] = new TextureRegion(jumpRightFrames[i]);
+			jumpLeftFrames[i].flip(true, false);
+		}
+		
+		walkRightFrames = new TextureRegion[8];
+		for (int i = 0; i < 8; i++)
+			walkRightFrames[i] = frames[4][i];
+		
+		walkLeftFrames = new TextureRegion[8];
+		for (int i = 0; i < 8; i++) {
+			walkLeftFrames[i] = new TextureRegion(walkRightFrames[i]);
+			walkLeftFrames[i].flip(true, false);
+		}	
+		
+		runRightAnimation = new Animation(1/15f, runRightFrames);
+		runLeftAnimation = new Animation(1/15f, runLeftFrames);
+		walkRightAnimation = new Animation(1/8f, walkRightFrames);
+		walkLeftAnimation = new Animation(1/8f, walkLeftFrames);
 		
 		isLeftButtonDown = false;
 		isRightButtonDown = false;
 		isJumpButtonDown = false;
-		
-		shapeRenderer = new ShapeRenderer();
+		isFacingRight = true;
+		isOnGround = false;
+		stateTime = 0;
 	}
 	
 	public void draw(Batch batch, float alpha) {
-		switch (state) {
-		case STAND_RIGHT:
-			batch.draw(standFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
-			break;
-		default:
-			batch.draw(standFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+		if (isOnGround) {
+			if (vel.x > 0) {
+				if (vel.x > 2 * Blocked.maxSpeed / 3)
+					batch.draw(runRightAnimation.getKeyFrame(stateTime, true), 
+							getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(walkRightAnimation.getKeyFrame(stateTime, true), 
+							getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			} else if (vel.x < 0) {
+				if (vel.x < -2 * Blocked.maxSpeed / 3) 
+					batch.draw(runLeftAnimation.getKeyFrame(stateTime, true), 
+						getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else {
+					batch.draw(walkLeftAnimation.getKeyFrame(stateTime, true), 
+							getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				}
+			} else {
+				if (isFacingRight)
+					batch.draw(standRightFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else 
+					batch.draw(standLeftFrame, getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
+		} else { // jumping
+			if (vel.y > Blocked.jumpSpeed / 2) {
+				if (isFacingRight)
+					batch.draw(jumpRightFrames[3], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(jumpLeftFrames[3], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
+			if (vel.y > 0 && vel.y <= Blocked.jumpSpeed / 2) {
+				if (isFacingRight)
+					batch.draw(jumpRightFrames[4], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(jumpLeftFrames[4], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
+			if (vel.y <= 0 && vel.y > -Blocked.jumpSpeed / 2) {
+				if (isFacingRight)
+					batch.draw(jumpRightFrames[5], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(jumpLeftFrames[5], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
+			if (vel.y <= -Blocked.jumpSpeed / 2) {
+				if (isFacingRight)
+					batch.draw(jumpRightFrames[6], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(jumpLeftFrames[6], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
+			if (vel.y < -Blocked.jumpSpeed) {
+				if (isFacingRight)
+					batch.draw(jumpRightFrames[7], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+				else
+					batch.draw(jumpLeftFrames[7], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
+			}
 		}
 	}
 
@@ -84,10 +157,14 @@ public class Player extends Entity {
 		
 		stateTime += delta;
 		
-		if (isRightButtonDown)
+		if (isRightButtonDown) {
 			accel.x = runAccel;
-		if (isLeftButtonDown)
+			isFacingRight = true;
+		}
+		if (isLeftButtonDown) {
 			accel.x = -runAccel;
+			isFacingRight = false;
+		}
 		if (!isLeftButtonDown && !isRightButtonDown) {
 			accel.x = 0;
 			if (vel.x < friction && vel.x > -friction) {
@@ -99,7 +176,7 @@ public class Player extends Entity {
 					vel.x = vel.x + friction;
 			}
 		}
-		if (isJumpButtonDown && vel.y == 0)
+		if (isJumpButtonDown && isOnGround)
 			vel.y = Blocked.jumpSpeed;
 	}
 }

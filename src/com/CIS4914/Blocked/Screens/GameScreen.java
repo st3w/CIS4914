@@ -21,8 +21,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -30,7 +28,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
@@ -108,6 +105,7 @@ public class GameScreen implements Screen {
 	
 	public void updateWorld(float delta) {
 		Rectangle collisionRectangle = new Rectangle();
+		player.isOnGround = false;
 		
 		for (Entity ent1 : entities) {
 			if (!ent1.isMovable()) 
@@ -123,8 +121,11 @@ public class GameScreen implements Screen {
 				
 				// If ent1 collides with a static object
 				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
-					if (ent1 instanceof Player)
+					if (ent1 instanceof Player) {
 						player.isJumpButtonDown = false;
+						if (ent1.getY() > ent2.getY())
+							player.isOnGround = true;
+					}
 					ent1.resolveY(ent2, collisionRectangle);
 				}
 			}
