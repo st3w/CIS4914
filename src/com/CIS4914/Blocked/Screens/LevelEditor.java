@@ -526,7 +526,7 @@ public class LevelEditor implements Screen, GestureListener {
 
 	@Override
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		if(camera.position.x - deltaX * 2 > 0 && camera.position.x - deltaX * 2 < 1920 * (backgroundTiles - 1)){
+		if(camera.position.x - deltaX * 2 > 0 && camera.position.x - deltaX * 2 < 90 * selectedLevel.getWidth() - 1920){
 			camera.translate(-deltaX * 2,0);
 			camera.update();
 		}
