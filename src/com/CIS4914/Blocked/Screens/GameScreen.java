@@ -104,6 +104,7 @@ public class GameScreen implements Screen {
 	}
 	
 	public void updateWorld(float delta) {
+		delta = MathUtils.clamp(delta, 1/60f, 1/10f);
 		Rectangle collisionRectangle = new Rectangle();
 		player.isOnGround = false;
 		

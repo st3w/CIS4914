@@ -135,13 +135,13 @@ public class Player extends Entity {
 				else
 					batch.draw(jumpLeftFrames[5], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 			}
-			if (vel.y <= -Blocked.jumpSpeed / 2) {
+			if (vel.y <= -Blocked.jumpSpeed / 2 && vel.y > -Blocked.jumpSpeed) {
 				if (isFacingRight)
 					batch.draw(jumpRightFrames[6], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 				else
 					batch.draw(jumpLeftFrames[6], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 			}
-			if (vel.y < -Blocked.jumpSpeed) {
+			if (vel.y <= -Blocked.jumpSpeed) {
 				if (isFacingRight)
 					batch.draw(jumpRightFrames[7], getTextureX(), getTextureY(), getTextureWidth(), getTextureHeight());
 				else
