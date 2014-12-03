@@ -7,7 +7,7 @@ import com.CIS4914.Blocked.Screens.MainMenu;
 
 public class Blocked extends Game {
 	
-	public static final String version = "V0.00.09 Pre-Alpha (Game Screen Transitions and Start of Game Screen UI)";
+	public static final String version = "V0.00.1 Alpha (Win and Lose States)";
 	public static final String LOG = "Blocked";
 	public static AssetManager manager;
 	public static final int blockSize = 90;
