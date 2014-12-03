@@ -154,7 +154,7 @@ public class GameScreen implements Screen {
 					continue;
 				
 				// If ent1 collides with a static object
-				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
+				if (ent1.collides(ent2, collisionRectangle)) {
 					if (ent1 instanceof Player) {
 						player.isJumpButtonDown = false;
 						if (ent1.getY() > ent2.getY())
@@ -172,9 +172,9 @@ public class GameScreen implements Screen {
 					continue;
 				
 				// If ent1 collides with a static object
-				if ((!ent2.isMovable()) && ent1.collides(ent2, collisionRectangle)) {
-					ent1.resolveX(ent2, collisionRectangle);
-				}
+				if (ent1.collides(ent2, collisionRectangle)) {
+						ent1.resolveX(ent2, collisionRectangle);
+				} 
 			}
 			
 			borderCollide(ent1);
@@ -201,7 +201,7 @@ public class GameScreen implements Screen {
 	
 	public void borderCollide(Entity ent) {
 		// Off Bottom (DEATH)
-		if(ent.getY() <= 0){
+		if(ent.getY() <= 0 && ent instanceof Player){
 			gameState = GAME_OVER;
 			Gdx.input.setInputProcessor(loseStage);
 			fadeStage.addAction(Actions.alpha(.7f, .5f));
@@ -209,7 +209,7 @@ public class GameScreen implements Screen {
 		}
 		
 		// To 2nd to last block (Win State)
-		if(ent.getX() + ent.getWidth() > (selectedLevel.getWidth() - 2) * Blocked.blockSize){
+		if(ent.getX() + ent.getWidth() > (selectedLevel.getWidth() - 2) * Blocked.blockSize && ent instanceof Player){
 			gameState = GAME_WON;
 			Gdx.input.setInputProcessor(winStage);
 			fadeStage.addAction(Actions.alpha(.7f, .5f));
@@ -266,6 +266,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
+		System.out.println(Gdx.files.getLocalStoragePath());
 		stage = new Stage(new ExtendViewport(1080, 880, 2560, 880));
 		UIStage = new Stage();
 		fadeStage = new Stage();
@@ -405,6 +406,12 @@ public class GameScreen implements Screen {
 					Block immovableBlock = new Block(new Rectangle(Blocked.blockSize * j, Blocked.worldHeight - (Blocked.blockSize * (i + 1)), Blocked.blockSize, Blocked.blockSize), Blocked.manager.get("bricks/brick.png", Texture.class), "Immovable Block");
 					stage.addActor(immovableBlock);
 					entities.add(immovableBlock);
+				}
+				if (selectedLevel.getGrid(j, i) == 2) {
+					Block movableBlock = new Block(new Rectangle(Blocked.blockSize * j, Blocked.worldHeight - (Blocked.blockSize * (i + 1)), Blocked.blockSize, Blocked.blockSize), Blocked.manager.get("bricks/brick.png", Texture.class), "Movable Block");
+					movableBlock.setIsMovable(true);
+					stage.addActor(movableBlock);
+					entities.add(movableBlock);
 				}
 			}
 		}

@@ -88,14 +88,22 @@ public class Entity extends Actor {
 	}
 	
 	public void resolveX(Entity other, Rectangle collisionRectangle) {
-		if (getX() + getWidth() < other.getX() + other.getWidth()) {
-			setX(getX() - collisionRectangle.width - .01f);
-			vel.x = 0;
-			accel.x = 0;
+		if (!other.isMovable()) {
+			if (getX() + getWidth() < other.getX() + other.getWidth()) {
+				setX(getX() - collisionRectangle.width - .01f);
+				vel.x = 0;
+				accel.x = 0;
+			} else {
+				setX(other.getX() + other.getWidth() + .01f);
+				vel.x = 0;
+				accel.x = 0;
+			}
 		} else {
-			setX(other.getX() + other.getWidth() + .01f);
-			vel.x = 0;
-			accel.x = 0;
+			if (getX() + getWidth() < other.getX() + other.getWidth()) {
+				other.setX(other.getX() + collisionRectangle.width + .01f);
+			} else {
+				other.setX(other.getX() - collisionRectangle.width + .01f);
+			}
 		}
 	}
 	
