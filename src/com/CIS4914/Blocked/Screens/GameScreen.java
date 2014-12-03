@@ -13,6 +13,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
@@ -29,17 +30,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameScreen implements Screen {
 	private static final int GAME_PLAYING = 0;
-	private static final int GAME_PAUSED = 1;
-	private static final int GAME_OVER = 2;
+	private static final int GAME_OVER = 1;
+	private static final int GAME_WON = 2;
 	
 	private int gameState;
-	private Stage stage, UIStage, fadeStage;
+	private Stage stage, UIStage, fadeStage, winStage, loseStage;
 	private Blocked game;
 	private Image background;
 	private ArrayList<Entity> entities;
@@ -47,7 +51,9 @@ public class GameScreen implements Screen {
 	
 	Image blackBackground;
 	private TextButtonStyle buttonStyle;
-	private TextButton2 mainMenu;
+	private TextButton2 mainMenu, winMainMenu, loseMainMenu;
+	private LabelStyle labelStyle;
+	private Label winLabel, loseLabel;
 	Button moveLeft, moveRight, moveJump;
 	
 	private BitmapFont defaultFont;
@@ -100,6 +106,33 @@ public class GameScreen implements Screen {
 			}
 			shapeRenderer.end();
 			*/
+			break;
+		case GAME_OVER:
+			stage.act(delta);
+
+			fadeStage.act(Gdx.graphics.getDeltaTime());
+			updateCamera();
+			
+			batch.begin();
+			stage.draw();
+			UIStage.draw();
+			fadeStage.draw();
+			loseStage.draw();
+			batch.end();
+			break;
+		case GAME_WON:
+			stage.act(delta);
+
+			fadeStage.act(Gdx.graphics.getDeltaTime());
+			updateCamera();
+			
+			batch.begin();
+			stage.draw();
+			UIStage.draw();
+			fadeStage.draw();
+			winStage.draw();
+			batch.end();
+			break;
 		}
 	}
 	
@@ -167,6 +200,22 @@ public class GameScreen implements Screen {
 	}
 	
 	public void borderCollide(Entity ent) {
+		// Off Bottom (DEATH)
+		if(ent.getY() <= 0){
+			gameState = GAME_OVER;
+			Gdx.input.setInputProcessor(loseStage);
+			fadeStage.addAction(Actions.alpha(.7f, .5f));
+			System.out.println("Lose");
+		}
+		
+		// To 2nd to last block (Win State)
+		if(ent.getX() + ent.getWidth() > (selectedLevel.getWidth() - 2) * Blocked.blockSize){
+			gameState = GAME_WON;
+			Gdx.input.setInputProcessor(winStage);
+			fadeStage.addAction(Actions.alpha(.7f, .5f));
+			System.out.println("Win");
+		}
+		
 		// Off the left end of the screen
 		if (ent.getX() < 0) {
 			ent.setX(0);
@@ -220,6 +269,8 @@ public class GameScreen implements Screen {
 		stage = new Stage(new ExtendViewport(1080, 880, 2560, 880));
 		UIStage = new Stage();
 		fadeStage = new Stage();
+		winStage = new Stage();
+		loseStage = new Stage();
 		
 		batch = new SpriteBatch();
 		skin = new Skin();
@@ -264,7 +315,48 @@ public class GameScreen implements Screen {
 		UIStage.addActor(moveRight);
 		UIStage.addActor(moveJump);
 		
+		labelStyle = new LabelStyle(defaultFont, Color.WHITE);
+		
+		winMainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.5f - buttonWidth * 0.5f, height * 0.4f, buttonWidth, buttonHeight);
+		winLabel = new Label("Stage Complete", labelStyle);
+		winLabel.setAlignment(Align.center);
+		winLabel.setX(width * 0.5f - winLabel.getWidth() * 0.5f);
+		winLabel.setY(height * 0.55f);
+		
+		winStage.addActor(winMainMenu);
+		winStage.addActor(winLabel);
+		
+		loseMainMenu = new TextButton2("Main Menu", buttonStyle, width * 0.5f - buttonWidth * 0.5f, height * 0.4f, buttonWidth, buttonHeight);
+		loseLabel = new Label("Game Over", labelStyle);
+		loseLabel.setAlignment(Align.center);
+		loseLabel.setX(width * 0.5f - loseLabel.getWidth() * 0.5f);
+		loseLabel.setY(height * 0.55f);
+		
+		loseStage.addActor(loseMainMenu);
+		loseStage.addActor(loseLabel);
+		
+		
 		mainMenu.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				game.setScreen(new MainMenu(game));
+			}
+		});
+		
+		winMainMenu.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				game.setScreen(new MainMenu(game));
+			}
+		});
+		
+		loseMainMenu.addListener(new InputListener() {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				return true;
 			}
