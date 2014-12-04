@@ -51,13 +51,13 @@ public class LevelEditor implements Screen, GestureListener {
 	Skin skin;
 	BitmapFont defaultFont, invisibleFont;
 	TextureAtlas textures;
-	Texture tableBackground, gameBackground, gridBackground, immovableBlock,saveBackground;
+	Texture tableBackground, gameBackground, gridBackground, immovableBlock, movableBlock, saveBackground;
 	Image tableBackgroundImage, saveBackgroundImage;
 	Vector<Sprite> background = new Vector<Sprite>();
 	int backgroundTiles, gridTiles, blockTiles;
 	
 	//Button Variables
-	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle;
+	TextButtonStyle buttonStyle, buttonStyleCheckable, blockButtonStyle, movableBlockButtonStyle;
 	TextButton2 mainMenu, save, saveMenu, saveCancel;
 	Table levelList;
 	
@@ -135,11 +135,12 @@ public class LevelEditor implements Screen, GestureListener {
 			camera.update();
 		}
 		
-		//TEMPORARY
+		
+		//labels for blocks
 		final Vector<String> blocks = new Vector();
 		
-		blocks.add("A");
-		blocks.add("B");
+		blocks.add("A");	// immovable block
+		blocks.add("B");	// movable block
 		blocks.add("C");
 		blocks.add("D");
 		blocks.add("E");
@@ -150,7 +151,7 @@ public class LevelEditor implements Screen, GestureListener {
 		blocks.add("J");
 		blocks.add("K");
 		blocks.add("L");
-		//TEMPORARY
+		
 		
 		Texture blackTexture = Blocked.manager.get("black.jpg");
 		Image blackBackground = new Image(blackTexture);
@@ -178,6 +179,7 @@ public class LevelEditor implements Screen, GestureListener {
         buttonStyle = new TextButtonStyle(skin.getDrawable("button_up"), skin.getDrawable("button_down"), null, defaultFont);
 		buttonStyleCheckable = new TextButtonStyle(skin.getDrawable("button_up"), skin.getDrawable("button_down"), skin.getDrawable("button_down"), defaultFont);
 		blockButtonStyle = new TextButtonStyle(skin.getDrawable("brick_button_up"), skin.getDrawable("brick_button_down"), skin.getDrawable("brick_button_down"), invisibleFont);
+		movableBlockButtonStyle = new TextButtonStyle(skin.getDrawable("movable_block_button_up"), skin.getDrawable("movable_block_button_down"), skin.getDrawable("movable_block_button_down"), invisibleFont);
 		
 		float buttonWidth = width * 0.18f;
 		float buttonHeight = width * 0.06f;
@@ -211,11 +213,18 @@ public class LevelEditor implements Screen, GestureListener {
 		for(int i = 0; i < blocks.size(); i++){
 			final TextButton temp2;
 			
-			if(i == 0){
-				temp2 = new TextButton(blocks.get(i), blockButtonStyle);
-			} else{
-				temp2 = new TextButton(blocks.get(i), buttonStyleCheckable);
+			switch(i){
+			case 0:		temp2 = new TextButton(blocks.get(i), blockButtonStyle);
+						break;
+						
+			case 1:		temp2 = new TextButton(blocks.get(i), movableBlockButtonStyle);
+						break;
+						
+			default:	temp2 = new TextButton(blocks.get(i), buttonStyleCheckable);
+						break;
+				
 			}
+			
 			
 			//button from list
 			temp2.addListener(new InputListener(){
@@ -454,12 +463,20 @@ public class LevelEditor implements Screen, GestureListener {
 		
 		// Add blocks to background vector
 		immovableBlock = Blocked.manager.get("bricks/brick.png");
+		movableBlock = Blocked.manager.get("bricks/movable_block.png");
 		blockTiles = 0;
 		for(int i = 0; i < 12; i++){
 			for(int j = 0; j < selectedLevel.getWidth(); j++){
 				if(selectedLevel.getGrid(j, i) == 1){
 					blockTiles++;
 					Sprite blockSprite = new Sprite(immovableBlock);
+					blockSprite.setOrigin(0, 0);
+					blockSprite.setPosition((90 * j) + -1920/2,-(90 * i) + 450);
+					background.add(blockSprite);
+				}
+				if(selectedLevel.getGrid(j,i) == 2){
+					blockTiles++;
+					Sprite blockSprite = new Sprite(movableBlock);
 					blockSprite.setOrigin(0, 0);
 					blockSprite.setPosition((90 * j) + -1920/2,-(90 * i) + 450);
 					background.add(blockSprite);
@@ -499,12 +516,10 @@ public class LevelEditor implements Screen, GestureListener {
 			if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(0).getActor()).isChecked()){
 				selectedLevel.setGrid(1, xPos, yPos);
 			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(1).getActor()).isChecked()){
-				// Set to second block
+				selectedLevel.setGrid(2, xPos, yPos);
 			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(2).getActor()).isChecked()){
 				// Set to third block
-			}else if(selectedLevel.getGrid(xPos, yPos) == 0 && ((TextButton) list.get(3).getActor()).isChecked()){
-				// Set to fourth block
-			}else if(selectedLevel.getGrid(xPos, yPos) == 1){
+			}else if(selectedLevel.getGrid(xPos, yPos) != 0){
 				selectedLevel.setGrid(0, xPos, yPos);
 			}
 		}

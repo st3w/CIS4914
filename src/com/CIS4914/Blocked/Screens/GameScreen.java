@@ -408,7 +408,7 @@ public class GameScreen implements Screen {
 					entities.add(immovableBlock);
 				}
 				if (selectedLevel.getGrid(j, i) == 2) {
-					Block movableBlock = new Block(new Rectangle(Blocked.blockSize * j, Blocked.worldHeight - (Blocked.blockSize * (i + 1)), Blocked.blockSize, Blocked.blockSize), Blocked.manager.get("bricks/brick.png", Texture.class), "Movable Block");
+					Block movableBlock = new Block(new Rectangle(Blocked.blockSize * j, Blocked.worldHeight - (Blocked.blockSize * (i + 1)), Blocked.blockSize, Blocked.blockSize), Blocked.manager.get("bricks/movable_block.png", Texture.class), "Movable Block");
 					movableBlock.setIsMovable(true);
 					stage.addActor(movableBlock);
 					entities.add(movableBlock);
