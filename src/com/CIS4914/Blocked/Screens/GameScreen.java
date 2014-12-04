@@ -54,7 +54,7 @@ public class GameScreen implements Screen {
 	private TextButton2 mainMenu, winMainMenu, loseMainMenu;
 	private LabelStyle labelStyle;
 	private Label winLabel, loseLabel;
-	Button moveLeft, moveRight, moveJump;
+	Button moveLeft, moveRight, moveJump, moveJump2;
 	
 	private BitmapFont defaultFont;
 	Skin skin;
@@ -262,6 +262,7 @@ public class GameScreen implements Screen {
 		moveLeft.setBounds(width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
 		moveRight.setBounds(width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
 		moveJump.setBounds(width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
+		moveJump2.setBounds(width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
 	}
 
 	@Override
@@ -310,11 +311,13 @@ public class GameScreen implements Screen {
 		moveLeft = new Button2(skin.getDrawable("left_arrow"), skin.getDrawable("left_arrow_down"), width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
 		moveRight = new Button2(skin.getDrawable("right_arrow"), skin.getDrawable("right_arrow_down"), width - buttonWidth * 1.2f - width * 0.015f, width * 0.015f, buttonWidth * 1.2f, buttonHeight * 1.7f);
 		moveJump = new Button2(skin.getDrawable("jump_button"), skin.getDrawable("jump_button_down"), width - buttonWidth - width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
+		moveJump2 = new Button2(skin.getDrawable("jump_button"), skin.getDrawable("jump_button_down"), width * 0.015f, width * 0.07f + buttonHeight, buttonWidth, buttonWidth * 0.6f);
 		
 		UIStage.addActor(mainMenu);
 		UIStage.addActor(moveLeft);
 		UIStage.addActor(moveRight);
 		UIStage.addActor(moveJump);
+		UIStage.addActor(moveJump2);
 		
 		labelStyle = new LabelStyle(defaultFont, Color.WHITE);
 		
@@ -390,6 +393,17 @@ public class GameScreen implements Screen {
 		});
 		
 		moveJump.addListener(new InputListener() {
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+				player.isJumpButtonDown = true;
+				return true;
+			}
+			
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				player.isJumpButtonDown = false;
+			}
+		});
+		
+		moveJump2.addListener(new InputListener() {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				player.isJumpButtonDown = true;
 				return true;
