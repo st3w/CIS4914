@@ -69,6 +69,7 @@ public class SplashScreen implements Screen{
 		fadeTime = 1.0f;
 		
 		Blocked.manager.load("bricks/brick.png", Texture.class);
+		Blocked.manager.load("bricks/movable_block.png", Texture.class);
 	   	Blocked.manager.load("game_background.jpg", Texture.class);
 	   	Blocked.manager.load("grid.png", Texture.class);
 	   	Blocked.manager.load("main_menu_background.png", Texture.class);
