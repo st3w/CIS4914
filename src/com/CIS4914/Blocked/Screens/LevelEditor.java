@@ -335,8 +335,6 @@ public class LevelEditor implements Screen, GestureListener {
 								}
 							}
 
-
-
 							if(nameConflict){
 								for(int i = 0; i < levelArray.length; i++){
 									String levelSave = json.toJson(levelArray[i]);

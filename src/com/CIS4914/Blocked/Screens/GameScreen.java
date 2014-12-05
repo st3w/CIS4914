@@ -109,7 +109,10 @@ public class GameScreen implements Screen {
 			break;
 		case GAME_OVER:
 			stage.act(delta);
-
+			
+			player.vel.x = 0;
+			player.vel.y = 0;
+			
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
 			
@@ -122,6 +125,9 @@ public class GameScreen implements Screen {
 			break;
 		case GAME_WON:
 			stage.act(delta);
+			
+			player.vel.x = 0;
+			player.vel.y = 0;
 
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
