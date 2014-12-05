@@ -16,7 +16,7 @@ public class Blocked extends Game {
 	public static final float jumpHeight = 3.25f; // height in blocks
 	public static final float gravity = 2f * jumpHeight * Blocked.blockSize / (.44f * .44f);
 	public static final float jumpSpeed = (float) Math.sqrt(2 * gravity * blockSize * jumpHeight);
-	public static final float maxSpeed = 1000;
+	public static final float maxSpeed = 1000;	
 	
     private MainMenu mainMenuScreen;
 
