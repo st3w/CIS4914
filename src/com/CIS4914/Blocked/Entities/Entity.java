@@ -87,35 +87,37 @@ public class Entity extends Actor {
 		return false;
 	}
 	
-	public void resolveX(Entity other, Rectangle collisionRectangle) {
+	public void resolveX(Entity other, Rectangle collisionRectangle, float playerVelX) {
 		if (!other.isMovable()) {
 			if (getX() + getWidth() < other.getX() + other.getWidth()) {
-				setX(getX() - collisionRectangle.width - .01f);
+				setX(getX() - collisionRectangle.width);
 				vel.x = 0;
 				accel.x = 0;
 			} else {
-				setX(other.getX() + other.getWidth() + .01f);
+				setX(other.getX() + other.getWidth());
 				vel.x = 0;
 				accel.x = 0;
 			}
 		} else {
 			if (getX() + getWidth() < other.getX() + other.getWidth()) {
-				other.setX(other.getX() + collisionRectangle.width + .01f);
+				other.setX(other.getX() + collisionRectangle.width);
 			} else {
-				other.setX(other.getX() - collisionRectangle.width + .01f);
+				other.setX(other.getX() - collisionRectangle.width);
 			}
 		}
 	}
 	
 	public void resolveY(Entity other, Rectangle collisionRectangle) {
-		if (getY() > other.getY()) {
-			setY(getY() + collisionRectangle.height + .01f);
-			vel.y = 0;
-			accel.y = 0;
-		} else {
-			setY(other.getY() - getHeight() - .01f);
-			vel.y = 0;
-			accel.y = 0;
+		if (Math.abs(getY() - other.getY()) > 1f) {
+			if (getY() > other.getY()) {
+				setY(getY() + collisionRectangle.height);
+				vel.y = 0;
+				accel.y = 0;
+			} else {
+				setY(other.getY() - getHeight());
+				vel.y = 0;
+				accel.y = 0;
+			}
 		}
 	}
 	

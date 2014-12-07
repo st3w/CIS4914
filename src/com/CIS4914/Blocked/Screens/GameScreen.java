@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -80,8 +81,10 @@ public class GameScreen implements Screen {
 		switch (gameState) {
 		case GAME_PLAYING:
 			stage.act(delta);
+			
+			//for (int i = 0; i < 5; i++)
+			//	updateWorld(delta/5);
 			updateWorld(delta);
-
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
 			
@@ -92,7 +95,7 @@ public class GameScreen implements Screen {
 			batch.end();
 
 			// Developer Collision Edges
-			/*
+			
 			shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(1, 0, 1, 1);
@@ -105,13 +108,10 @@ public class GameScreen implements Screen {
 				shapeRenderer.rect(entity.getX(), entity.getY(), entity.getWidth(), entity.getHeight());
 			}
 			shapeRenderer.end();
-			*/
+			
 			break;
 		case GAME_OVER:
 			stage.act(delta);
-			
-			player.vel.x = 0;
-			player.vel.y = 0;
 			
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
@@ -143,7 +143,7 @@ public class GameScreen implements Screen {
 	}
 	
 	public void updateWorld(float delta) {
-		delta = MathUtils.clamp(delta, 1/60f, 1/10f);
+		delta = MathUtils.clamp(delta, 0f, 1/10f);
 		Rectangle collisionRectangle = new Rectangle();
 		player.isOnGround = false;
 		
@@ -159,7 +159,6 @@ public class GameScreen implements Screen {
 				if (ent1.equals(ent2))
 					continue;
 				
-				// If ent1 collides with a static object
 				if (ent1.collides(ent2, collisionRectangle)) {
 					if (ent1 instanceof Player) {
 						player.isJumpButtonDown = false;
@@ -177,9 +176,8 @@ public class GameScreen implements Screen {
 				if (ent1.equals(ent2))
 					continue;
 				
-				// If ent1 collides with a static object
 				if (ent1.collides(ent2, collisionRectangle)) {
-						ent1.resolveX(ent2, collisionRectangle);
+						ent1.resolveX(ent2, collisionRectangle, player.vel.x);
 				} 
 			}
 			
