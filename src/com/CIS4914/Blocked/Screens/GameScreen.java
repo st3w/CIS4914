@@ -13,6 +13,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -63,10 +66,13 @@ public class GameScreen implements Screen {
 	
 	InputMultiplexer input = new InputMultiplexer();
 	SpriteBatch batch;
-	
+		
 	private Level selectedLevel;
 	
 	private ShapeRenderer shapeRenderer;
+	
+   	private Music mp3Music;
+   	private Sound jumpSound;
 	
 	public GameScreen(Level selectedLevel, Blocked game) {
 		this.game = game;
@@ -80,6 +86,7 @@ public class GameScreen implements Screen {
 
 		switch (gameState) {
 		case GAME_PLAYING:
+			
 			stage.act(delta);
 			
 			//for (int i = 0; i < 5; i++)
@@ -110,9 +117,11 @@ public class GameScreen implements Screen {
 			shapeRenderer.end();
 			
 			break;
-		case GAME_OVER:
+		case GAME_OVER:			
 			stage.act(delta);
 			
+			mp3Music.pause();
+
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
 			
@@ -123,12 +132,12 @@ public class GameScreen implements Screen {
 			loseStage.draw();
 			batch.end();
 			break;
-		case GAME_WON:
+		case GAME_WON:			
 			stage.act(delta);
 			
 			player.vel.x = 0;
 			player.vel.y = 0;
-
+			mp3Music.pause();
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
 			
@@ -146,7 +155,7 @@ public class GameScreen implements Screen {
 		delta = MathUtils.clamp(delta, 0f, 1/10f);
 		Rectangle collisionRectangle = new Rectangle();
 		player.isOnGround = false;
-		
+
 		for (Entity ent1 : entities) {
 			if (!ent1.isMovable()) 
 				continue;
@@ -343,6 +352,8 @@ public class GameScreen implements Screen {
 		loseStage.addActor(loseMainMenu);
 		loseStage.addActor(loseLabel);
 		
+	   	mp3Music =  Gdx.audio.newMusic(Gdx.files.internal("sounds/menuTheme.mp3"));
+	   	jumpSound = Gdx.audio.newSound(Gdx.files.internal("sounds/jumpSound.mp3"));
 		
 		mainMenu.addListener(new InputListener() {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -458,10 +469,14 @@ public class GameScreen implements Screen {
 				else if (keycode == Input.Keys.RIGHT)
 					player.isRightButtonDown = false;
 				else if (keycode == Input.Keys.UP)
+					jumpSound.play(1.0f);
 					player.isJumpButtonDown = false;
 				return true;
 			}
 		});
+		mp3Music.setVolume(0.5f);
+		mp3Music.setLooping(true);
+		mp3Music.play();
 		
 		gameState = GAME_PLAYING;
 	}
@@ -475,6 +490,8 @@ public class GameScreen implements Screen {
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
+		mp3Music.dispose();
+		jumpSound.dispose();
 		
 	}
 
@@ -482,11 +499,14 @@ public class GameScreen implements Screen {
 	public void resume() {
 		// TODO Auto-generated method stub
 		//gameState = GAME_PAUSED;
+		mp3Music.play();
 	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 		stage.dispose();
+		mp3Music.dispose();
+		jumpSound.dispose();
 	}
 }

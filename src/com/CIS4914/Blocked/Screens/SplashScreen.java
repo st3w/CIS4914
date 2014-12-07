@@ -3,6 +3,7 @@ package com.CIS4914.Blocked.Screens;
 import com.CIS4914.Blocked.Blocked;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -77,6 +78,7 @@ public class SplashScreen implements Screen{
 		Blocked.manager.load("table_background.png", Texture.class);
 		Blocked.manager.load("generic.png", Texture.class);
 		Blocked.manager.load("black.jpg", Texture.class);
+		//Blocked.manager.load("sounds/menuTheme.mp3", Music.class);
 	}
 
 	@Override
