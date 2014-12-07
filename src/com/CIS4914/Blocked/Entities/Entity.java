@@ -108,8 +108,8 @@ public class Entity extends Actor {
 	}
 	
 	public void resolveY(Entity other, Rectangle collisionRectangle) {
-		if (Math.abs(getY() - other.getY()) > 1f) {
-			if (getY() > other.getY()) {
+		if (Math.abs(getY() - other.getY()) > 5f) {
+			if (getY() >= other.getY()) {
 				setY(getY() + collisionRectangle.height);
 				vel.y = 0;
 				accel.y = 0;

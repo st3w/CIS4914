@@ -119,8 +119,6 @@ public class GameScreen implements Screen {
 			break;
 		case GAME_OVER:			
 			stage.act(delta);
-			
-			mp3Music.pause();
 
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
@@ -137,10 +135,10 @@ public class GameScreen implements Screen {
 			
 			player.vel.x = 0;
 			player.vel.y = 0;
-			mp3Music.pause();
 			fadeStage.act(Gdx.graphics.getDeltaTime());
 			updateCamera();
 			
+			mp3Music.pause();
 			batch.begin();
 			stage.draw();
 			UIStage.draw();
@@ -220,6 +218,9 @@ public class GameScreen implements Screen {
 			fadeStage.addAction(Actions.alpha(.7f, .5f));
 			System.out.println("Lose");
 		}
+		
+		if (ent.getY() < 0 && ent instanceof Block)
+			return;
 		
 		// To 2nd to last block (Win State)
 		if(ent.getX() + ent.getWidth() > (selectedLevel.getWidth() - 2) * Blocked.blockSize && ent instanceof Player){
@@ -361,6 +362,7 @@ public class GameScreen implements Screen {
 			}
 			
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				mp3Music.pause();
 				game.setScreen(new MainMenu(game));
 			}
 		});
@@ -371,6 +373,7 @@ public class GameScreen implements Screen {
 			}
 			
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+				mp3Music.pause();
 				game.setScreen(new MainMenu(game));
 			}
 		});
@@ -457,10 +460,13 @@ public class GameScreen implements Screen {
 					player.isLeftButtonDown = true;
 				else if (keycode == Input.Keys.RIGHT)
 					player.isRightButtonDown = true;
-				else if (keycode == Input.Keys.UP)
+				else if (keycode == Input.Keys.UP) {
+					jumpSound.play(1.0f);
 					player.isJumpButtonDown = true;
-				else if (keycode == Input.Keys.ESCAPE)
+				} else if (keycode == Input.Keys.ESCAPE) {
 					game.setScreen(new GameMenu(game));
+					mp3Music.pause();
+				}
 				return true;
 			}
 			public boolean keyUp(InputEvent input, int keycode) {
@@ -469,7 +475,6 @@ public class GameScreen implements Screen {
 				else if (keycode == Input.Keys.RIGHT)
 					player.isRightButtonDown = false;
 				else if (keycode == Input.Keys.UP)
-					jumpSound.play(1.0f);
 					player.isJumpButtonDown = false;
 				return true;
 			}
@@ -490,6 +495,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
+		mp3Music.pause();
 		mp3Music.dispose();
 		jumpSound.dispose();
 		
@@ -505,6 +511,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
+		mp3Music.stop();
 		stage.dispose();
 		mp3Music.dispose();
 		jumpSound.dispose();
